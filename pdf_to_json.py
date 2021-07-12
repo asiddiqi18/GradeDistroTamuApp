@@ -70,7 +70,6 @@ class PdfToJson:
             with open(pdf_path, 'wb') as f:
                 f.write(res.content)
 
-            print("PDF saved to computer.")
         
         return pdf_path
 
