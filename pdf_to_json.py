@@ -69,7 +69,6 @@ class PdfToJson:
 
             with open(pdf_path, 'wb') as f:
                 f.write(res.content)
-
         
         return pdf_path
 
@@ -111,7 +110,7 @@ class PdfToJson:
             return results
 
 
-    def courses_list_to_json(self, list_of_courses):
+    def _courses_list_to_json(self, list_of_courses):
         if (len(list_of_courses) == 0):
             logging.warn("No courses were found.")
             return None
@@ -200,7 +199,7 @@ class PdfToJson:
         logging.info("Converting content to JSON...")
 
         logging.info("Saving JSON to file...")
-        json_obj = self.courses_list_to_json(results)
+        json_obj = self._courses_list_to_json(results)
         json_dir = self.directory / pathlib.Path("json")
         json_dir.mkdir(parents=True, exist_ok=True)
         json_file = json_dir / pathlib.Path(self.name() + ".json")
@@ -211,13 +210,24 @@ class PdfToJson:
 
         self.json = json_obj
 
+
     def get_json_obj(self):
         if self.json is None:
             self.save_json()
         return self.json
 
 
+    def get_list_of_lists(self):
+        logging.info("Downloading PDF...")
+
+        pdf_path = self.download_pdf(self.college, self.year, self.semester)
+
+        logging.info("Extracting content from PDF...")
+        results = self.text_extractor(pdf_path)
+        
+        return results
 
 if __name__ == "__main__":
     pdf_json = PdfToJson("engineering", "2021", "spring")
-    pdf_json.save_json("engineering", "2021", "spring")
+    pdf_json.save_json()
+

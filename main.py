@@ -1,8 +1,6 @@
-from pdf_to_json import PdfToJson
+from website import create_app
 
-def main():
-    pdf_json = PdfToJson("engineering", "2020", "spring")
-    pdf_json.save_json()
+app = create_app()
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    app.run(debug=True)
