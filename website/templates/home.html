@@ -4,114 +4,161 @@
 {% block content %}
 <h1 class="mt-5">This is the home page.</h1>
 <br />
-<form class="text-center border border-light p-5 mb-5" method="Get" action="results">
+<div class="text-center border border-light p-5 mb-5">
 
-    <p class="h4 mb-4">See Grade Distributions</p>
+    <ul class="nav nav-pills nav-fill mb-3" id="pills-tab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab"
+                aria-controls="pills-home" aria-selected="true">Sort by Course <i class="fas fa-university"></i></a>
+        </li>
+        <li class="nav-item ">
+            <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab"
+                aria-controls="pills-profile" aria-selected="false">Sort by Professor <i
+                    class="fas fa-user-tie"></i></a>
+        </li>
+    </ul>
 
-    <p class="mb-5">Know which professors or courses to take and avoid!</p>
+    <div class="tab-content pt-2 pl-1" id="pills-tabContent">
+        <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+            <p class="h4 mb-4">Sort by college, year and semester</p>
 
-    <!-- College -->
+            <p class="mb-5">Know which professors or courses to take and avoid!</p>
 
-    <input class="form-control mb-4" placeholder="College" list="ice-cream-flavors" id="ice-cream-choice" name="ice-cream-choice" />
+            <!-- College -->
+            <form method="Get" action="results">
+                <label for="college">College</label>
+                <input class="form-control mb-4" placeholder="College" list="colleges" id="college" name="college" />
 
-    <datalist id="ice-cream-flavors">
-        <option value="Academic success center">
-        <option value="Agriculture and life sciences">
-        <option value="Architecture">
-        <option value="Associate provost for undergraduate programs">
-        <option value="Bush school of government & public service">
-        <option value="Business">
-        <option value="Dentistry (professional)">
-        <option value="Dentistry (undergraduate/graduate)">
-        <option value="Education">
-        <option value="Engineering">
-        <option value="Geosciences">
-        <option value="Liberal arts">
-        <option value="Medicine (professional)">
-        <option value="Medicine (undergraduate & graduate)">
-        <option value="Military science">
-        <option value="Nursing">
-        <option value="Pharmacy (professional)">
-        <option value="Public health">
-        <option value="School of law (professional)">
-        <option value="School of law (undergraduate & graduate)">
-        <option value="Science">
-        <option value="Texas a&m university at galveston">
-        <option value="Texas a&m university at qatar">
-        <option value="Veterinary medicine (professional)">
-        <option value="Veterinary medicine (undergraduate & graduate)">
-    </datalist>
+                <datalist id="colleges">
+                    <option value="Academic success center">
+                    <option value="Agriculture and life sciences">
+                    <option value="Architecture">
+                    <option value="Associate provost for undergraduate programs">
+                    <option value="Bush school of government & public service">
+                    <option value="Business">
+                    <option value="Dentistry (professional)">
+                    <option value="Dentistry (undergraduate/graduate)">
+                    <option value="Education">
+                    <option value="Engineering">
+                    <option value="Geosciences">
+                    <option value="Liberal arts">
+                    <option value="Medicine (professional)">
+                    <option value="Medicine (undergraduate & graduate)">
+                    <option value="Military science">
+                    <option value="Nursing">
+                    <option value="Pharmacy (professional)">
+                    <option value="Public health">
+                    <option value="School of law (professional)">
+                    <option value="School of law (undergraduate & graduate)">
+                    <option value="Science">
+                    <option value="Texas a&m university at galveston">
+                    <option value="Texas a&m university at qatar">
+                    <option value="Veterinary medicine (professional)">
+                    <option value="Veterinary medicine (undergraduate & graduate)">
+                </datalist>
 
-    <!-- Semester -->
-    <label>Semester</label>
-    <select name="semester" class="browser-default custom-select mb-4">
-        <option value="" disabled>Choose semester</option>
-        <option selected value="spring">Spring</option>
-        <option value="summer">Summer</option>
-        <option value="fall">Fall</option>
-    </select>
+                <!-- Semester -->
+                <div class="form-row">
+                    <div class="form-group col-md mr-3">
+                        <label for="semester">Semester</label>
+                        <select name="semester" id="semester" class="browser-default custom-select mb-4">
+                            <option value="" disabled>Choose semester</option>
+                            <option selected value="spring">Spring</option>
+                            <option value="summer">Summer</option>
+                            <option value="fall">Fall</option>
+                        </select>
+                    </div>
 
-    <!-- Semester -->
-    <label>Year</label>
-    <select name="year" class="browser-default custom-select mb-4">
-        <option value="" disabled>Choose year</option>
-        <option selected value="2016">2016</option>
-        <option value="2017">2017</option>
-        <option value="2018">2018</option>
-        <option value="2019">2019</option>
-        <option value="2020">2020</option>
-        <option value="2021">2021</option>
-    </select>
+                    <!-- Semester -->
+                    <div class="form-group col-md ml-3">
+                        <label for="year">Year</label>
+                        <select name="year" id="year" class="browser-default custom-select mb-4">
+                            <option value="" disabled>Choose year</option>
+                            <option selected value="2016">2016</option>
+                            <option value="2017">2017</option>
+                            <option value="2018">2018</option>
+                            <option value="2019">2019</option>
+                            <option value="2020">2020</option>
+                            <option value="2021">2021</option>
+                        </select>
+                    </div>
+                </div>
 
-    <!-- Send button -->
-    <button class="btn btn-info btn-block" type="submit">Send</button>
+                <!-- Send button -->
+                <button class="btn btn-info btn-block" type="submit">Search</button>
+            </form>
 
-</form>
+        </div>
+        <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+            <p class="h4 mb-4">Sort by professors</p>
+
+            <p class="mb-5">Know which professors to take and avoid!</p>
+
+            <!-- College -->
+            <form method="Get" action="professors">
+                <label for="professor">Professor</label>
+                <input class="form-control mb-4" placeholder="Professor Name" id="professor" name="professor" />
+
+                <!-- Send button -->
+                <button class="btn btn-info btn-block" type="submit">Search</button>
+            </form>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
 
 {% if grade_results|length == 0 %}
-    <p>use the above form to get data</p>
+<p>use the above form to get data</p>
 {% else %}
-    <table id="dtBasicExample" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
-        <thead>
-            <tr>
-                <th class="th-sm">Department</th>
-                <th class="th-sm">Course</th>
-                <th class="th-sm">Section</th>
-                <th class="th-sm">A</th>
-                <th class="th-sm">B</th>
-                <th class="th-sm">C</th>
-                <th class="th-sm">D</th>
-                <th class="th-sm">F</th>
-                <th class="th-sm">Instructor</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for grade in grade_results %}
-            <tr>
-                <td>{{ grade.department }}</td>
-                <td>{{ grade.course }}</td>
-                <td>{{ grade.section }}</td>
-                <td>{{ grade.amount_A }} <div class="text-muted">({{ "%.2f"|format(grade.percent_A) }}%)</div></td>
-                <td>{{ grade.amount_B }} <div class="text-muted">({{ "%.2f"|format(grade.percent_B) }})%</div></td>
-                <td>{{ grade.amount_C }} <div class="text-muted">({{ "%.2f"|format(grade.percent_C) }})%</div></td>
-                <td>{{ grade.amount_D }} <div class="text-muted">({{ "%.2f"|format(grade.percent_D) }})%</div></td>
-                <td>{{ grade.amount_F }} <div class="text-muted">({{ "%.2f"|format(grade.percent_F) }})%</div></td>
-                <td>{{ grade.instructor }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-        <tfoot>
-            <tr>
-                <th>Department</th>
-                <th>Course</th>
-                <th>Section</th>
-                <th>A</th>
-                <th>B</th>
-                <th>C</th>
-                <th>D</th>
-                <th>F</th>
-            </tr>
-        </tfoot>
-    </table>
+<table id="dtBasicExample" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th class="th-sm">Department</th>
+            <th class="th-sm">Course</th>
+            <th class="th-sm">Section</th>
+            <th class="th-sm">A</th>
+            <th class="th-sm">B</th>
+            <th class="th-sm">C</th>
+            <th class="th-sm">D</th>
+            <th class="th-sm">F</th>
+            <th class="th-sm">Instructor</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for grade in grade_results %}
+        <tr>
+            <td>{{ grade.department }}</td>
+            <td>{{ grade.course }}</td>
+            <td>{{ grade.section }}</td>
+            <td>{{ grade.amount_A }} <div class="text-muted">({{ "%.2f"|format(grade.percent_A) }}%)</div>
+            </td>
+            <td>{{ grade.amount_B }} <div class="text-muted">({{ "%.2f"|format(grade.percent_B) }})%</div>
+            </td>
+            <td>{{ grade.amount_C }} <div class="text-muted">({{ "%.2f"|format(grade.percent_C) }})%</div>
+            </td>
+            <td>{{ grade.amount_D }} <div class="text-muted">({{ "%.2f"|format(grade.percent_D) }})%</div>
+            </td>
+            <td>{{ grade.amount_F }} <div class="text-muted">({{ "%.2f"|format(grade.percent_F) }})%</div>
+            </td>
+            <td>{{ grade.instructor }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Department</th>
+            <th>Course</th>
+            <th>Section</th>
+            <th>A</th>
+            <th>B</th>
+            <th>C</th>
+            <th>D</th>
+            <th>F</th>
+        </tr>
+    </tfoot>
+</table>
 {% endif %}
 {% endblock %}

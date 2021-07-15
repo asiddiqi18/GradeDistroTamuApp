@@ -12,6 +12,15 @@ def home():
     return render_template("home.html", grade_results=[])
 
 
+@views.route('/professors', methods=["GET", "POST"])
+def professor():
+    professor = request.args['professor']
+    professors = Grades.query.filter_by(
+        instructor=professor).all()
+    return render_template("home.html", grade_results=professors)
+
+
+
 @views.route('/results', methods=["GET", "POST"])
 def result():
     college = request.args['college']
