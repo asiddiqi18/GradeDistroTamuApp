@@ -6,9 +6,11 @@ views = Blueprint('views', __name__)
 
 # https://www.youtube.com/watch?v=dam0GPOAvVI
 
+
 @views.route('/')
 def home():
-    return render_template("home.html")
+    return render_template("home.html", grade_results=[])
+
 
 @views.route('/results', methods=["GET", "POST"])
 def result():
@@ -17,66 +19,52 @@ def result():
     year = request.args['year']
     print(f"{college}, {semester}, {year}")
 
-    pdf_json = PdfToJson(college, year, semester)
-    results = pdf_json.get_list_of_lists()
+    grades = Grades.query.filter_by(
+        college=college, semester=semester, year=year).all()
 
-    for result in results:
-            department = result[0]
-            course = result[1]
-            section = result[2]
-
-            amount_A = result[3]
-            amount_B = result[5]
-            amount_C = result[7]
-            amount_D = result[9]
-            amount_F = result[11]
-
-            percent_A = result[4]
-            percent_B = result[6]
-            percent_C = result[8]
-            percent_D = result[10]
-            percent_F = result[12]
-
-            total_A_F = result[13]
-            gpa = result[14]
-
-            other_I = result[15]
-            other_S = result[16]
-            other_U = result[17]
-            other_Q = result[18]
-            other_X = result[19]
-            other_total = result[20]
-
-            instructor = result[21]
-
+    if (grades):
+        print("Records in database... retrieving from database...")
+    else:
+        print("Records not in database... retrieving from PDF...")
+        pdf_json = PdfToJson(college, year, semester)
+        results = pdf_json.get_list_of_lists()
+        grades = []
+        for result in results:
             new_grade = Grades(
-                department = department, 
-                course = course,
-                section = section,
-                amount_A = amount_A,
-                percent_A =  percent_A,
-                amount_B =  amount_B,
-                percent_B =  percent_B,
-                amount_C =  amount_C,
-                percent_C =  percent_C,
-                amount_D =  amount_D,
-                percent_D =  percent_D,
-                amount_F =  amount_F,
-                percent_F =  percent_F,
-                total_A_F =  total_A_F,
-                gpa =  gpa,
-                other_I =  other_I,
-                other_S =  other_S,
-                other_U =  other_U,
-                other_Q =  other_Q,
-                other_X =  other_X,
-                other_total =  other_total,
-                instructor =  instructor
+                college=college,
+                year=year,
+                semester=semester,
+                department=result[0],
+                course=result[1],
+                section=result[2],
+                amount_A=result[3],
+                percent_A=result[4],
+                amount_B=result[5],
+                percent_B=result[6],
+                amount_C=result[7],
+                percent_C=result[8],
+                amount_D=result[9],
+                percent_D=result[10],
+                amount_F=result[11],
+                percent_F=result[12],
+                total_A_F=result[13],
+                gpa=result[14],
+                other_I=result[15],
+                other_S=result[16],
+                other_U=result[17],
+                other_Q=result[18],
+                other_X=result[19],
+                other_total=result[20],
+                instructor=result[21]
             )
 
-            db.session.add(new_grade)
-            db.session.commit()
+            grades.append(new_grade)
 
-    print(results)
+        db.session.add_all(grades)
+        db.session.commit()
 
-    return render_template("home.html")
+    with open('website/tmp/debug_grades.txt', 'w') as file:
+        for grade in grades:
+            file.write(grade.__repr__() + '\n')
+
+    return render_template("home.html", grade_results=grades)

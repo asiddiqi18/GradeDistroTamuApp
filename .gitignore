@@ -142,4 +142,6 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+website/static/MDB-Free_4.19.2
+website/static/Semantic-UI-CSS-master
 # End of https://www.toptal.com/developers/gitignore/api/python

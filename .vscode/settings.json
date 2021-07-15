@@ -1,5 +1,9 @@
 {
     "python.pythonPath": "env/bin/python",
     "python.linting.pylintEnabled": true,
-    "python.linting.enabled": false
+    "python.linting.enabled": false,
+    "material-icon-theme.files.associations": {
+    
+    },
+    "emmet.includeLanguages": {"jinja-html": "html"},
 }

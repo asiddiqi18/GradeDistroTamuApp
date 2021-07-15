@@ -88,6 +88,7 @@ class PdfToJson:
             shelf.close()
             return results
 
+        # TODO: 2016 no work
         regex = re.compile(r'(\D{4})-(\d{3})-(\d{3})\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+(\d+.\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\S+\s\w)')
         with open(path, 'rb') as f:
             pdf = PdfFileReader(f)
