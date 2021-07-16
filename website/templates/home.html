@@ -30,9 +30,7 @@
             <p class="mb-5">Know which professors or courses to take and avoid!</p>
 
             <!-- College -->
-            <form class="mt-5" method="POST" action="results" id="form_results">
-
-                {{ form.csrf_token }}
+            <form class="mt-5" method="GET" action="results" id="form_results">
             
                 <!-- College -->
                 <div class="form-group mx-3">{{ render_field(form.college, placeholder=form.college.label.text) }}</div>
@@ -65,8 +63,7 @@
             <p class="mb-5">Know which professors to take and avoid!</p>
 
             <!-- Professor -->
-            <form method="POST" class="needs-validation" action="professors" novalidate>
-                {{ form.csrf_token }}
+            <form method="GET" class="needs-validation" action="professors" novalidate>
 
                 <div class="row">
                     <div class="col-md-6 offset-md-3">
