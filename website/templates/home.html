@@ -6,7 +6,7 @@
 <br />
 <div class="text-center border border-light p-5 mb-5">
 
-    <ul class="nav nav-pills nav-fill mb-3" id="pills-tab" role="tablist">
+    <ul class="nav nav-pills nav-fill mb-4" id="pills-tab" role="tablist">
         <li class="nav-item">
             <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab"
                 aria-controls="pills-home" aria-selected="true">Sort by Course <i class="fas fa-university"></i></a>
@@ -25,7 +25,7 @@
             <p class="mb-5">Know which professors or courses to take and avoid!</p>
 
             <!-- College -->
-            <form method="Get" action="results">
+            <form method="Get" action="results" id="form_results">
                 <label for="college">College</label>
                 <input class="form-control mb-4" placeholder="College" list="colleges" id="college" name="college" />
 
@@ -107,8 +107,6 @@
         </div>
     </div>
 </div>
-
-
 
 {% if grade_results|length == 0 %}
 <p>use the above form to get data</p>

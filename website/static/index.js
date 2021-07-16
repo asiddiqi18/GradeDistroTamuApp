@@ -1,9 +1,7 @@
-console.log("LINKED")
-
 $(document).ready(function () {
     $('#dtBasicExample').DataTable();
     $('.dataTables_length').addClass('bs-select');
-    });
+});
 
 let states = [
     "Alabama",
@@ -56,13 +54,4 @@ let states = [
     "West Virginia",
     "Wisconsin",
     "Wyoming"
-    ];
-    
-    $('#form-autocomplete-4').mdbAutocomplete({
-    data: states,
-    dataColor: 'green',
-    inputFocus: '2px solid green',
-    inputBlur: '1px solid #ced4da',
-    inputFocusShadow: '0 1px 0 0 #4285f4',
-    inputBlurShadow: ''
-    });
+];

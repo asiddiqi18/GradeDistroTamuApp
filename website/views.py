@@ -17,7 +17,8 @@ def professor():
     professor = request.args['professor']
     professors = Grades.query.filter_by(
         instructor=professor).all()
-    return render_template("home.html", grade_results=professors)
+    selected = []
+    return render_template("home.html", grade_results=professors, inputs=selected)
 
 
 
@@ -27,6 +28,8 @@ def result():
     semester = request.args['semester']
     year = request.args['year']
     print(f"{college}, {semester}, {year}")
+    selected = [college, semester, year]
+
 
     grades = Grades.query.filter_by(
         college=college, semester=semester, year=year).all()
@@ -35,7 +38,7 @@ def result():
         print("Records in database... retrieving from database...")
     else:
         print("Records not in database... retrieving from PDF...")
-        pdf_json = PdfToJson(college, year, semester)
+        pdf_json = PdfToJson(college, year, semester, inputs=selected)
         results = pdf_json.get_list_of_lists()
         grades = []
         for result in results:
