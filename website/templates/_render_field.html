@@ -1,0 +1,9 @@
+{% macro render_field(field) %}
+<label for="{{ field.name }}">{{ field.label.text }}</label>
+    {{ field(class_='form-control browser-default custom-select', **kwargs)|safe }}
+{% endmacro %}
+
+{% macro render_string_field(field) %}
+<label for="{{ field.name }}">{{ field.label.text }}</label>
+    {{ field(class_='form-control browser-default form-control', **kwargs)|safe }}
+{% endmacro %}

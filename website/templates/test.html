@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Grades{% endblock %}
+
+{% from "_render_field.html" import render_field %}
+{% block content %}
+<h1 class="mt-5">This is a test page.</h1>
+<br />
+<div class="text-center border border-light p-5 mb-5">
+
+  <form class="mt-5" method="POST" action="test" id="test">
+
+    {{ form.csrf_token }}
+
+    <!-- College -->
+    <div class="form-group ml-3 mr-3">{{ render_field(form.college, placeholder=form.college.label.text) }}</div>
+
+
+
+    <div class="form-row">
+      <!-- Semester -->
+      <div class="form-group col-md mr-3 ml-3 mt-3 mb-1">
+        {{ render_field(form.semester, placeholder=form.semester.label.text) }}
+      </div>
+
+      <!-- Year -->
+      <div class="form-group col-md ml-3 mr-3 mt-3 mb-1">
+        {{ render_field(form.year, placeholder=form.year.label.text) }}
+      </div>
+    </div>
+
+    <!-- Send button -->
+    <button class="btn btn-info btn-block mt-4" type="submit">Search</button>
+  </form>
+</div>
+
+{% endblock %}

@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, flash
 from pdf_to_json import *
 from .models import Grades
 from . import db
+from .forms import CourseForm
 views = Blueprint('views', __name__)
 
 # https://www.youtube.com/watch?v=dam0GPOAvVI
@@ -9,74 +10,81 @@ views = Blueprint('views', __name__)
 
 @views.route('/')
 def home():
-    return render_template("home.html", grade_results=[])
+    form = CourseForm()
+    source = "course"
+    return render_template("home.html", grade_results=None, form=form, source=source)
 
 
 @views.route('/professors', methods=["GET", "POST"])
 def professor():
-    professor = request.args['professor']
-    professors = Grades.query.filter_by(
-        instructor=professor).all()
-    selected = []
-    return render_template("home.html", grade_results=professors, inputs=selected)
-
+    form = CourseForm()
+    source = "professor"
+    if request.method == 'GET':
+        return render_template("home.html", grade_results=None, form=form, source=source)
+    if request.method == 'POST':
+        source = "professor"
+        professor = request.form.get('professor')
+        # professors = Grades.query.filter_by(instructor=professor).all()
+        professors = Grades.query.filter(Grades.instructor.like(professor + "%")).all()
+        return render_template("home.html", grade_results=professors, form=form, source=source)
 
 
 @views.route('/results', methods=["GET", "POST"])
 def result():
-    college = request.args['college']
-    semester = request.args['semester']
-    year = request.args['year']
-    print(f"{college}, {semester}, {year}")
-    selected = [college, semester, year]
+    form = CourseForm()
+    source = "course"
+    if request.method == 'GET':
+        return render_template("home.html", grade_results=None, form=form, source=source)
+    if request.method == 'POST':
+        source = "course"
+        college = request.form.get('college')
+        semester = request.form.get('semester')
+        year = request.form.get('year')
 
 
-    grades = Grades.query.filter_by(
-        college=college, semester=semester, year=year).all()
+        print(f"{college}, {semester}, {year}")
 
-    if (grades):
-        print("Records in database... retrieving from database...")
-    else:
-        print("Records not in database... retrieving from PDF...")
-        pdf_json = PdfToJson(college, year, semester, inputs=selected)
-        results = pdf_json.get_list_of_lists()
-        grades = []
-        for result in results:
-            new_grade = Grades(
-                college=college,
-                year=year,
-                semester=semester,
-                department=result[0],
-                course=result[1],
-                section=result[2],
-                amount_A=result[3],
-                percent_A=result[4],
-                amount_B=result[5],
-                percent_B=result[6],
-                amount_C=result[7],
-                percent_C=result[8],
-                amount_D=result[9],
-                percent_D=result[10],
-                amount_F=result[11],
-                percent_F=result[12],
-                total_A_F=result[13],
-                gpa=result[14],
-                other_I=result[15],
-                other_S=result[16],
-                other_U=result[17],
-                other_Q=result[18],
-                other_X=result[19],
-                other_total=result[20],
-                instructor=result[21]
-            )
+        grades = Grades.query.filter_by(college=college, semester=semester, year=year).all()
 
-            grades.append(new_grade)
+        if (grades):
+            print("Records in database... retrieving from database...")
+        else:
+            print("Records not in database... retrieving from PDF...")
+            pdf_json = PdfToJson(college, year, semester)
+            results = pdf_json.get_list_of_lists()
+            grades = []
+            for result in results:
+                new_grade = Grades(
+                    college=college,
+                    year=year,
+                    semester=semester,
+                    department=result[0],
+                    course=result[1],
+                    section=result[2],
+                    amount_A=result[3],
+                    percent_A=result[4],
+                    amount_B=result[5],
+                    percent_B=result[6],
+                    amount_C=result[7],
+                    percent_C=result[8],
+                    amount_D=result[9],
+                    percent_D=result[10],
+                    amount_F=result[11],
+                    percent_F=result[12],
+                    total_A_F=result[13],
+                    gpa=result[14],
+                    other_I=result[15],
+                    other_S=result[16],
+                    other_U=result[17],
+                    other_Q=result[18],
+                    other_X=result[19],
+                    other_total=result[20],
+                    instructor=result[21]
+                )
 
-        db.session.add_all(grades)
-        db.session.commit()
+                grades.append(new_grade)
 
-    with open('website/tmp/debug_grades.txt', 'w') as file:
-        for grade in grades:
-            file.write(grade.__repr__() + '\n')
+            db.session.add_all(grades)
+            db.session.commit()
 
-    return render_template("home.html", grade_results=grades)
+        return render_template("home.html", grade_results=grades, form=form, source=source)
