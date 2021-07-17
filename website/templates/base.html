@@ -26,50 +26,127 @@
 <body>
     <!--Navbar-->
     <div class="d-flex flex-column min-vh-100">
-    <nav class="navbar navbar-expand-lg navbar-dark primary-color mb-4">
+        <nav class="navbar navbar-expand-lg navbar-dark primary-color mb-4">
 
-        <!-- Navbar brand -->
-        <a class="navbar-brand" href="/">TAMU Grade Distrubition Database</a>
+            <!-- Navbar brand -->
+            <a class="navbar-brand" href="/">TAMU Grade Distrubition Database</a>
 
 
 
-        <!-- Collapse button -->
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#basicExampleNav"
-            aria-controls="basicExampleNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+            <!-- Collapse button -->
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#basicExampleNav"
+                aria-controls="basicExampleNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-        <!-- Collapsible content -->
-        <div class="collapse navbar-collapse" id="basicExampleNav">
+            <!-- Collapsible content -->
+            <div class="collapse navbar-collapse" id="basicExampleNav">
 
-            <!-- Links -->
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Home
-                        <span class="sr-only">(current)</span>
-                    </a>
-                </li>
-            </ul>
-            <!-- Links -->
+                <!-- Links -->
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#"><i class="fas fa-home"></i> Home
+                            <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                </ul>
 
-    </nav>
-    <!--/.Navbar-->
-    <main class="flex-fill">
-        <div class="container">
+                <ul class="navbar-nav ml-auto nav-flex-icons">
+                    <li class="nav-item" data-toggle="modal" data-target="#centralModalSuccess">
+                        <a class="nav-link waves-effect waves-light">
+                            <i class="fas fa-link"></i>
+                        </a>
+                    </li>
+                </ul>
+
+
+                <!-- Central Modal Medium Success -->
+                <div class="modal fade" id="centralModalSuccess" tabindex="-1" role="dialog"
+                    aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-notify modal-success" role="document">
+                        <!--Content-->
+                        <div class="modal-content">
+                            <!--Header-->
+                            <div class="modal-header">
+                                <p class="heading lead">Share this page</p>
+
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true" class="white-text">&times;</span>
+                                </button>
+                            </div>
+
+                            <!--Body-->
+                            <div class="modal-body">
+                                <div class="text-center">
+                                    <i class="fas fa-share fa-4x mb-3 animated rotateIn"></i>
+                                    <p>Share a link to this page:</p>
+                                    <div class="text-center">
+                                        <textarea id="page-link" class="form-control rounded-0 textarea-non-resize" rows="1"
+                                            readonly>{{ url }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--Footer-->
+                            <div class="modal-footer justify-content-center">
+                                <a type="button" class="btn btn-success" onclick="copyToClipboard()" data-dismiss="modal">Copy <i
+                                        class="fas fa-link ml-1 text-white"></i></a>
+                                <a type="button" class="btn btn-outline-success waves-effect"
+                                    data-dismiss="modal">Back</a>
+                            </div>
+                        </div>
+                        <!--/.Content-->
+                    </div>
+                </div>
+                <!-- Central Modal Medium Success-->
+                <!-- Links -->
+
+        </nav>
+
+
+
+        <!--/.Navbar-->
+        <main class="flex-fill">
+            
+            <div class="container">
+
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        {% if category == 'error' %}
+                        <div class="alert alert-danger alert-dismissable fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        {% elif category == 'success' %}
+                        <div class="alert alert-success alert-dismissable fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        {% endif %}
+                    {% endfor%}
+                {% endif %}
+            {% endwith %}
             {% block content%}
             {% endblock %}
-        </div>
-    </main>
+            </div>
 
-    <!-- Footer -->
-    <footer class="page-footer font-small blue">
+        </main>
 
-        <!-- Copyright -->
-        <div class="footer-copyright text-center py-3">© 2021 Copyright:
-            <a href="https://mdbootstrap.com/"> TAMU Grade Distribution</a>
-        </div>
+        <!-- Footer -->
+        <footer class="page-footer font-small blue">
 
-    </footer>
+            <!-- Copyright -->
+            <div class="footer-copyright text-center py-3">© 2021 Copyright:
+                <a href="https://mdbootstrap.com/"> TAMU Grade Distribution</a>
+            </div>
+
+        </footer>
     </div>
 
     <!-- JQuery -->

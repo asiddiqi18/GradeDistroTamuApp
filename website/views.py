@@ -12,21 +12,27 @@ views = Blueprint('views', __name__)
 def home():
     form = CourseForm()
     source = "course"
-    return render_template("home.html", grade_results=None, form=form, source=source)
+    url = request.url
+    print(url)
+    return render_template("home.html", grade_results=None, form=form, source=source, url=url)
 
 
 @views.route('/professors', methods=["GET", "POST"])
 def professor():
     source = "professor"
+    url = request.url
     professor = request.args.get('professor')
     form = CourseForm(professor=professor)
     professors = Grades.query.filter(Grades.instructor.like(professor + "%")).all()
-    return render_template("home.html", grade_results=professors, form=form, source=source)
+    if (len(professors) == 0):
+        flash('No results were found for this professor.', category='error')
+    return render_template("home.html", grade_results=professors, form=form, source=source, url=url)
 
 
 @views.route('/results', methods=["GET", "POST"])
 def result():
     source = "course"
+    url = request.url
     college = request.args.get('college')
     semester = request.args.get('semester')
     year = request.args.get('year')
@@ -77,4 +83,4 @@ def result():
         db.session.add_all(grades)
         db.session.commit()
 
-    return render_template("home.html", grade_results=grades, form=form, source=source)
+    return render_template("home.html", grade_results=grades, form=form, source=source, url=url)

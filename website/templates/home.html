@@ -93,6 +93,7 @@
             <tr>
                 <th class="th-sm">Department</th>
                 <th class="th-sm">Course / Section</th>
+                {% if source == 'professor' %} <th class="th-sm">Year</th> {% endif %}
                 <th class="th-sm">A</th>
                 <th class="th-sm">B</th>
                 <th class="th-sm">C</th>
@@ -107,6 +108,7 @@
             <tr>
                 <td>{{ grade.department }}</td>
                 <td>{{ grade.course }} - {{ grade.section }}</td>
+                {% if source == 'professor' %} <td>{{ grade.year }}</td> {% endif %}
                 <td>{{ grade.amount_A }} <div class="text-muted">({{ "%.2f"|format(grade.percent_A) }}%)</div>
                 </td>
                 <td>{{ grade.amount_B }} <div class="text-muted">({{ "%.2f"|format(grade.percent_B) }})%</div>

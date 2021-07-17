@@ -15,3 +15,12 @@ bottom: .5em;
     background-color: red;
     color: blue;
 } */
+
+.link-backdrop {
+    background-color: red;
+}
+
+.textarea-non-resize {
+    resize: none;
+    white-space: nowrap;
+  }
