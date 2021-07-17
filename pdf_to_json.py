@@ -6,17 +6,93 @@ from PyPDF2 import PdfFileReader
 import json
 import logging
 
+# The following sets of parameters do not have records of grade distributions.
+# ( [college=academic success center, year=2020, semester=summer] )
+# ( [college=academic success center, year=2017, semester=summer] )
+# ( [college=dentistry (professional), year=2017, semester=fall] )
+# ( [college=school of law (undergraduate & graduate), year=2020, semester=spring] )
+# ( [college=school of law (undergraduate & graduate), year=2018, semester=spring] )
+# ( [college=school of law (undergraduate & graduate), year=2018, semester=summer] )
+# ( [college=school of law (undergraduate & graduate), year=2017, semester=spring] )
+# ( [college=medicine (undergraduate & graduate), year=2020, semester=spring] )
+# ( [college=medicine (undergraduate & graduate), year=2019, semester=summer] )
+# ( [college=medicine (professional), year=2021, semester=spring] )
+# ( [college=medicine (professional), year=2019, semester=spring] )
+# ( [college=medicine (professional), year=2019, semester=summer] )
+# ( [college=medicine (professional), year=2017, semester=spring] )
+# ( [college=military science, year=2017, semester=summer] )
+
+# Malformed PDF's
+# ( [college=academic success center, year=2018, semester=summer] )
+# ( [college=dentistry (undergraduate/graduate), year=2017, semester=spring] )
+# ( [college=dentistry (undergraduate/graduate), year=2017, semester=summer] )
+# ( [college=dentistry (professional), year=2021, semester=spring] )
+# ( [college=dentistry (professional), year=2020, semester=spring] )
+# ( [college=dentistry (professional), year=2020, semester=summer] )
+# ( [college=dentistry (professional), year=2020, semester=fall] )
+# ( [college=dentistry (professional), year=2019, semester=spring] )
+# ( [college=dentistry (professional), year=2019, semester=summer] )
+# ( [college=dentistry (professional), year=2019, semester=fall] )
+# ( [college=dentistry (professional), year=2018, semester=spring] )
+# ( [college=dentistry (professional), year=2018, semester=summer] )
+# ( [college=dentistry (professional), year=2018, semester=fall] )
+# ( [college=dentistry (professional), year=2017, semester=spring] )
+# ( [college=dentistry (professional), year=2017, semester=summer] )
+# ( [college=school of law (professional), year=2021, semester=spring] )
+# ( [college=school of law (professional), year=2020, semester=spring] )
+# ( [college=school of law (professional), year=2020, semester=summer] )
+# ( [college=school of law (professional), year=2020, semester=fall] )
+# ( [college=school of law (professional), year=2019, semester=spring] )
+# ( [college=school of law (professional), year=2019, semester=summer] )
+# ( [college=school of law (professional), year=2019, semester=fall] )
+# ( [college=school of law (professional), year=2018, semester=spring] )
+# ( [college=school of law (professional), year=2018, semester=summer] )
+# ( [college=school of law (professional), year=2018, semester=fall] )
+# ( [college=school of law (professional), year=2017, semester=spring] )
+# ( [college=school of law (professional), year=2017, semester=summer] )
+# ( [college=school of law (professional), year=2017, semester=fall] )
+# ( [college=medicine (undergraduate & graduate), year=2019, semester=spring] )
+# ( [college=medicine (professional), year=2020, semester=spring] )
+# ( [college=medicine (professional), year=2020, semester=summer] )
+# ( [college=medicine (professional), year=2020, semester=fall] )
+# ( [college=medicine (professional), year=2019, semester=fall] )
+# ( [college=medicine (professional), year=2018, semester=spring] )
+# ( [college=medicine (professional), year=2018, semester=summer] )
+# ( [college=medicine (professional), year=2018, semester=fall] )
+# ( [college=medicine (professional), year=2017, semester=summer] )
+# ( [college=medicine (professional), year=2017, semester=fall] )
+# ( [college=military science, year=2020, semester=summer] )
+# ( [college=military science, year=2019, semester=summer] )
+# ( [college=military science, year=2018, semester=summer] )
+# ( [college=pharmacy (professional), year=2021, semester=spring] )
+# ( [college=pharmacy (professional), year=2020, semester=spring] )
+# ( [college=pharmacy (professional), year=2020, semester=summer] )
+# ( [college=pharmacy (professional), year=2020, semester=fall] )
+# ( [college=pharmacy (professional), year=2019, semester=spring] )
+# ( [college=pharmacy (professional), year=2019, semester=summer] )
+# ( [college=pharmacy (professional), year=2019, semester=fall] )
+# ( [college=pharmacy (professional), year=2018, semester=spring] )
+# ( [college=pharmacy (professional), year=2018, semester=summer] )
+# ( [college=pharmacy (professional), year=2018, semester=fall] )
+# ( [college=pharmacy (professional), year=2017, semester=spring] )
+# ( [college=pharmacy (professional), year=2017, semester=summer] )
+# ( [college=pharmacy (professional), year=2017, semester=fall] )
+# ( [college=veterinary medicine (professional), year=2019, semester=summer] )
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+parent_dir = pathlib.Path(__file__).parent.absolute()
+
+
+def get_colleges():
+    abb_dir = parent_dir / pathlib.Path("college_abbreviations.json")
+    with open(str(abb_dir), 'r') as file:
+        abbreviations = json.load(file)
+        return abbreviations
 
 
 class PdfToJson:
 
-    def __init__(self, college, year, semester, directory=None):
-        if (directory is None):
-            self.directory = pathlib.Path(__file__).parent.absolute()
-        else:
-            self.directory = directory
+    def __init__(self, college, year, semester):
         self.college = college
         self.year = year
         self.semester = semester
@@ -24,43 +100,43 @@ class PdfToJson:
         self.semesters = {"spring": 1, "summer": 2, "fall": 3}
         self.json = None
 
-    def get_college_abbreviation_map(self):
-        abb_dir = self.directory / pathlib.Path("college_abbreviations.json")
-
-        with open(str(abb_dir), 'r') as file:
-            abbreviations = json.load(file)
-            return abbreviations
-
+        abbreviation_dict = get_colleges()
+        if self.college.lower() not in abbreviation_dict:
+            raise ValueError("College '%s' not identified. Enter one of these following colleges: %s" % (self.college, ", ".join(list(abbreviation_dict.keys()))))
+        if int(self.year) < 2016:
+            raise ValueError("Data for years past 2016 do not exist!")
+        if self.semester not in self.semesters:
+            raise ValueError("Semester '%s' not identified. Enter one of the following semesters: %s" % ", ".join(self.semesters))
+                    
 
     def name(self):
-        return ("%s_%s_%s") % (self.college, self.year, self.semester)
+        filename = ("%s_%s_%s") % (self.college, self.year, self.semester)
+        dangerous_chars = [' ', '/']
+        for danger in dangerous_chars:
+            filename = filename.replace(danger, "_")
+        return filename
 
 
-    def download_pdf(self, college, year, semester):
+    def semesterToNumericCode(self):
+        return self.semesters[self.semester]
+
+
+    def download_pdf(self):
         '''
             Downloads grade reports to current directory from web, if not already installed.
             Takes in file name as only parameter, saves PDF to 'working directory/pdf'
             Returns path of downloaded PDF / existing PDF
         '''
 
-        abbreviation_dict = self.get_college_abbreviation_map()
-        if college.lower() not in abbreviation_dict:
-            raise ValueError("College '%s' not identified. Enter one of these following colleges: %s" % (college, ", ".join(list(abbreviation_dict.keys()))))
-        if int(year) < 2016:
-            raise ValueError("Data for years past 2016 do not exist!")
-
-        if semester not in self.semesters:
-            raise ValueError("Semester '%s' not identified. Enter one of the following semesters: %s" % ", ".join(self.semesters))
-        
-        abbreviation = abbreviation_dict[college.lower()]
+        abbreviation_dict = get_colleges()
+        abbreviation = abbreviation_dict[self.college.lower()]
         file_name = self.name() + ".pdf"
-        year_semester = year + str(self.semesters[semester])
+        year_semester = str(self.year) + str(self.semesterToNumericCode())
 
         url = 'https://web-as.tamu.edu/GradeReports/PDFReports/%s/grd%s%s.pdf' % (year_semester, year_semester, abbreviation)
 
-        pdf_dir = self.directory / pathlib.Path("pdf")
+        pdf_dir = parent_dir / pathlib.Path("pdf")
         pdf_dir.mkdir(parents=True, exist_ok=True)
-
         pdf_path = pdf_dir / pathlib.Path(file_name)
 
         if not pdf_path.exists():
@@ -70,12 +146,16 @@ class PdfToJson:
             with open(pdf_path, 'wb') as f:
                 f.write(res.content)
         
-        return pdf_path
+        self.pdf_path = pdf_path
 
 
-    def text_extractor(self, path):
+    def text_extractor(self, delete_pdf_after=True):
 
-        shelf_dir = self.directory / pathlib.Path("shelf")
+        if (self.pdf_path is None):
+            logging.info("No PDF file has been downloaded. Downloading now...")
+            self.download_pdf()
+
+        shelf_dir = parent_dir / pathlib.Path("shelf")
 
         shelf_dir.mkdir(parents=True, exist_ok=True)
 
@@ -90,13 +170,11 @@ class PdfToJson:
 
         # TODO: 2016 no work
         regex = re.compile(r'(\D{4})-(\d{3})-(\d{3})\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+(\d+.\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\S+\s\w)')
-        with open(path, 'rb') as f:
+        results = []
+        with open(self.pdf_path, 'rb') as f:
             pdf = PdfFileReader(f)
-            # get the first page
             number_of_pages = pdf.getNumPages()
             
-            results = []
-
             for p in range(number_of_pages):
                 page = pdf.getPage(p)
                 text = page.extractText()
@@ -108,10 +186,13 @@ class PdfToJson:
 
             shelf['data'] = results
             shelf.close()
-            return results
+
+        if (delete_pdf_after):
+            pathlib.Path.unlink(self.pdf_path)
+        return results
 
 
-    def _courses_list_to_json(self, list_of_courses):
+    def courses_list_to_json(self, list_of_courses):
         if (len(list_of_courses) == 0):
             logging.warn("No courses were found.")
             return None
@@ -173,13 +254,13 @@ class PdfToJson:
 
         return results_dict   
 
-
-    def clean(self):
+    @staticmethod
+    def clean():
 
         import shutil
         dir_names = ["shelf", "json", "pdf"]
         for dir in dir_names:
-            dir_path = self.directory / pathlib.Path(dir)
+            dir_path = parent_dir / pathlib.Path(dir)
             if dir_path.is_dir():
                 folder = str(dir_path)
                 shutil.rmtree(folder)
@@ -191,42 +272,36 @@ class PdfToJson:
             Downloads and parses a PDF file from TAMU grade distributions, returns JSON file containing info.
         '''
 
-        logging.info("Downloading PDF...")
+        if self.json is None:
+            self.get_json_obj()
 
-        pdf_path = self.download_pdf(self.college, self.year, self.semester)
-
-        logging.info("Extracting content from PDF...")
-        results = self.text_extractor(pdf_path)
-        logging.info("Converting content to JSON...")
-
-        logging.info("Saving JSON to file...")
-        json_obj = self._courses_list_to_json(results)
-        json_dir = self.directory / pathlib.Path("json")
+        json_dir = parent_dir / pathlib.Path("json")
         json_dir.mkdir(parents=True, exist_ok=True)
         json_file = json_dir / pathlib.Path(self.name() + ".json")
         with open(json_file, 'w') as file:
-            json.dump(json_obj, file, indent=4)
+            json.dump(self.json, file, indent=4)
 
         logging.info("Saved to JSON!")
-
-        self.json = json_obj
+        return json_file
 
 
     def get_json_obj(self):
-        if self.json is None:
-            self.save_json()
+        results = self.get_list_of_lists()
+
+        logging.info("Converting content to JSON...")
+        self.json = self.courses_list_to_json(results)
         return self.json
 
 
     def get_list_of_lists(self):
         logging.info("Downloading PDF...")
-
-        pdf_path = self.download_pdf(self.college, self.year, self.semester)
+        self.download_pdf()
 
         logging.info("Extracting content from PDF...")
-        results = self.text_extractor(pdf_path)
+        results = self.text_extractor()
         
         return results
+
 
 if __name__ == "__main__":
     pdf_json = PdfToJson("engineering", "2021", "spring")
