@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="static/image(2).png"/>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
     <!-- Google Fonts -->
@@ -26,12 +27,10 @@
 <body>
     <!--Navbar-->
     <div class="d-flex flex-column min-vh-100">
-        <nav class="navbar navbar-expand-lg navbar-dark primary-color mb-4">
+        <nav class="navbar navbar-expand-lg navbar-dark unique-color mb-4">
 
             <!-- Navbar brand -->
-            <a class="navbar-brand" href="/">TAMU Grade Distrubition Database</a>
-
-
+            <a class="navbar-brand ml-3" href="/">TAMU Grade Distrubition Database</a>
 
             <!-- Collapse button -->
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#basicExampleNav"
@@ -42,11 +41,19 @@
             <!-- Collapsible content -->
             <div class="collapse navbar-collapse" id="basicExampleNav">
 
+                {% set active_page = active_page|default('home') -%}
+
                 <!-- Links -->
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="#"><i class="fas fa-home"></i> Home
-                            <span class="sr-only">(current)</span>
+                    <li class="nav-item {% if active_page == 'home' %} active {% endif %} ml-4">
+                        <a class="nav-link" href="{{ url_for('views.home') }}"><i class="fas fa-home"></i> Home
+                            {% if active_page == 'home' %} <span class="sr-only">(current)</span> {% endif %}
+                            
+                        </a>
+                    </li>
+                    <li class="nav-item {% if active_page == 'about' %} active {% endif %} ml-4">
+                        <a class="nav-link" href="{{ url_for('views.about') }}"><i class="fas fa-info"></i> About
+                            {% if active_page == 'about' %} <span class="sr-only">(current)</span> {% endif %}
                         </a>
                     </li>
                 </ul>
@@ -142,7 +149,7 @@
         <footer class="page-footer font-small blue">
 
             <!-- Copyright -->
-            <div class="footer-copyright text-center py-3">© 2021 Copyright:
+            <div class="footer-copyright text-center unique-color py-3">© 2021 Copyright:
                 <a href="https://mdbootstrap.com/"> TAMU Grade Distribution</a>
             </div>
 

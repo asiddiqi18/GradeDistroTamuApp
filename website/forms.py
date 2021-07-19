@@ -6,19 +6,18 @@ import pathlib
 from wtforms.fields.core import StringField
 from wtforms.validators import InputRequired
 
-from pdf_to_json import get_colleges
+from pdf_parser import get_colleges
   
 # creating the date object of today's date
 todays_date = date.today()
 
-year_start = 2017
+year_start = 2016
 year_end = int(todays_date.year)
 years = []
 for i in reversed(range(year_start, year_end + 1)):
     years.append((i, i))
 
-abb_dir = pathlib.Path(__file__).parents[1].absolute() / pathlib.Path("college_abbreviations.json")
-abbreviations = get_colleges(abb_dir)
+abbreviations = get_colleges()
 
 colleges = []
 for college in abbreviations.keys():

@@ -1,8 +1,10 @@
 from flask import Blueprint, render_template, request, flash
-from pdf_to_json import *
-from .models import Grades
+import requests
+from .pdf_to_grades_parser import PdfParserDB
+from .models import Grades, Professor
 from . import db
 from .forms import CourseForm
+from . import unittest_db
 views = Blueprint('views', __name__)
 
 # https://www.youtube.com/watch?v=dam0GPOAvVI
@@ -17,24 +19,48 @@ def home():
     return render_template("home.html", grade_results=None, form=form, source=source, url=url)
 
 
+@views.route('/about', methods=["GET"])
+def about():
+    url = request.url
+    return render_template("about.html", url=url)
+
+
+
 @views.route('/professors', methods=["GET", "POST"])
 def professor():
     source = "professor"
     url = request.url
     professor = request.args.get('professor')
     form = CourseForm(professor=professor)
-    professors = Grades.query.filter(Grades.instructor.like(professor + "%")).all()
-    if (len(professors) == 0):
-        flash('No results were found for this professor.', category='error')
-    return render_template("home.html", grade_results=professors, form=form, source=source, url=url)
+    professors = Professor.query.filter(Professor.short_name.like(professor + "%")).first()
+    print(professors.__repr__())
+    # if (len(professors) == 0):
+    #     flash('No results were found for this professor.', category='error')
+    return render_template("home.html", grade_results=professors.classes, form=form, source=source, url=url)
+
+
+@views.route('/test', methods=['GET'])
+def test_unit():
+    print("Starting unit tests...")
+    unittest_db.unit_test()
+    print("Finished unit tests!")
+    return "Finished unit tests!"
+
+
+@views.route('/test_single', methods=['GET'])
+def test_single():
+    print("Starting unit tests...")
+    unittest_db.single_test("engineering", 2021, "spring")
+    print("Finished unit tests!")
+    return "Finished single test!"
 
 
 @views.route('/results', methods=["GET", "POST"])
 def result():
     source = "course"
     url = request.url
-    college = request.args.get('college')
-    semester = request.args.get('semester')
+    college = request.args.get('college').lower()
+    semester = request.args.get('semester').lower()
     year = request.args.get('year')
     form = CourseForm(college=college, semester=semester, year=year)
 
@@ -46,37 +72,27 @@ def result():
         print("Records in database... retrieving from database...")
     else:
         print("Records not in database... retrieving from PDF...")
-        pdf_json = PdfToJson(college, year, semester)
-        results = pdf_json.get_list_of_lists()
+        pdf_json = PdfParserDB(college, year, semester)
+
+        try:
+            results = pdf_json.text_extractor()
+        except requests.exceptions.HTTPError:
+            flash("There are no records for this semester.", category="error")
+            return render_template("home.html", grade_results=[], form=form, source=source, url=url)
+
         grades = []
         for result in results:
-            new_grade = Grades(
-                college=college,
-                year=year,
-                semester=semester,
-                department=result[0],
-                course=result[1],
-                section=result[2],
-                amount_A=result[3],
-                percent_A=result[4],
-                amount_B=result[5],
-                percent_B=result[6],
-                amount_C=result[7],
-                percent_C=result[8],
-                amount_D=result[9],
-                percent_D=result[10],
-                amount_F=result[11],
-                percent_F=result[12],
-                total_A_F=result[13],
-                gpa=result[14],
-                other_I=result[15],
-                other_S=result[16],
-                other_U=result[17],
-                other_Q=result[18],
-                other_X=result[19],
-                other_total=result[20],
-                instructor=result[21]
-            )
+
+            professor = Professor.query.filter_by(short_name=result[21]).first()
+            if not professor:
+                professor = Professor(short_name=result[21], full_name="null")
+                db.session.add(professor)
+                db.session.flush()
+                db.session.commit()
+
+            professor_id = professor.id
+                
+            new_grade = pdf_json.get_grade(result, professor_id)
 
             grades.append(new_grade)
 

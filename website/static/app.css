@@ -24,3 +24,12 @@ bottom: .5em;
     resize: none;
     white-space: nowrap;
   }
+
+@media (min-width: 768px) {
+.navbar-brand
+    {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}

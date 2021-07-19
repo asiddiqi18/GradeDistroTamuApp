@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% set active_page = "home" %}
+
 {% block title %}Grades{% endblock %}
 {% from "_render_field.html" import render_field, render_string_field %}
 
@@ -8,11 +10,11 @@
 <br />
 <div class="text-center border border-light p-5 mb-5">
 
-    <ul class="nav nav-pills nav-fill mb-4" id="pills-tab" role="tablist">
+    <ul class="nav nav-pills nav-fill mb-4 " id="pills-tab" role="tablist">
 
         <li class="nav-item">
             <a class="nav-link {% if source == 'course' %} active {% endif %}" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab"
-                aria-controls="pills-home" aria-selected="{% if source == 'course' %} true {% else%} false {% endif %}">Sort by Course <i class="fas fa-university"></i></a>
+                aria-controls="pills-home" aria-selected="{% if source == 'course' %} true {% else%} false {% endif %}">Sort by College <i class="fas fa-university"></i></a>
         </li>
 
         <li class="nav-item">
@@ -140,70 +142,6 @@
     {% endif %}
 {% endif %}
 <br/>
-
-
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-
-
-<a type="button" data-toggle="modal" data-target="#centralModalInfo">Launch
-    modal
-</a>
- 
-  <!-- Central Modal Medium Info -->
-  <div class="modal fade" id="centralModalInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-notify modal-info" role="document">
-      <!--Content-->
-      <div class="modal-content">
-        <!--Header-->
-        <div class="modal-header">
-          <p class="heading lead">Modal Info</p>
- 
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true" class="white-text">&times;</span>
-          </button>
-        </div>
- 
-        <!--Body-->
-        <div class="modal-body" >
-            <script type="text/javascript">
-                google.charts.load("current", {packages:["corechart"]});
-                google.charts.setOnLoadCallback(drawChart);
-                function drawChart() {
-                  var data = google.visualization.arrayToDataTable([
-                    ['Task', 'Hours per Day'],
-                    ['Work',     11],
-                    ['Eat',      2],
-                    ['Commute',  2],
-                    ['Watch TV', 2],
-                    ['Sleep',    7]
-                  ]);
-          
-                  var options = {
-                    title: 'My Daily Activities',
-                    width: 800,
-                    height: 400
-                  };
-          
-                  var chart = new google.visualization.PieChart(document.getElementById('piechart'));
-                  chart.draw(data, options);
-                }
-              </script>
-            <div id="piechart" style="width: 900px; height: 500px;"></div>
-
-        </div>
- 
-        <!--Footer-->
-        <div class="modal-footer justify-content-center">
-          <a type="button" class="btn btn-primary">Get it now <i class="far fa-gem ml-1 text-white"></i></a>
-          <a type="button" class="btn btn-outline-primary waves-effect" data-dismiss="modal">No, thanks</a>
-        </div>
-      </div>
-      <!--/.Content-->
-    </div>
-  </div>
-  <!-- Central Modal Medium Info-->
-
 
 
 {% endblock %}

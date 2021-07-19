@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% set active_page = "about" %}
+
+
+{% block title %}Grades{% endblock %}
+
+{% block content %}
+
+
+<h1 class="mt-5 text-center">About this website</h1>
+<hr />
+<section class="text-center">
+    <p>
+        This website is for viewing historical grade distrubitons from various colleges at Texas A&M University.
+        Professional colleges are not included in this database. Additionally, certain semesters do not have
+        records of grade distributions.
+    <p>
+        The grade distribution data comes from the Office of the Registrar from Texas A&M University. All data used for
+        this webpage was accessed from <a
+            href="https://web-as.tamu.edu/GradeReports/" target="_blank">https://web-as.tamu.edu/GradeReports/</a>.
+    </p>
+    </p>
+
+    <blockquote class="blockquote">
+        <p class="mb-0">In the interests of FERPA (Family Education Rights and Privacy Act) and the protection of
+            student privacy, course sections with an enrollment of less than five are not included in the reports.
+        </p>
+    </blockquote>
+    This website is self-maintaining, so as soon as future records are submitted by the registrar, the database will
+    also be automatically updated.
+
+    This service is not affiliated with any part of Texas A&M University.
+    </p>
+</section>
+{% endblock %}
