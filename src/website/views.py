@@ -23,20 +23,30 @@ def about():
     return render_template("about.html", url=url)
 
 
-
 @views.route('/professors', methods=["GET", "POST"])
 def professor():
     source = "professor"
     url = request.url
     professor = request.args.get('professor')
     form = CourseForm(professor=professor)
-    professors = Professor.query.filter(Professor.short_name.like(professor + "%")).first()
-    print(professors.__repr__())
-    if professors is None:
-        flash('No results were found for this professor.', category='error')
+    if len(professor) < 3:
+        flash('This name is too short. Please enter a longer name.', 'error')
+        grades = []
+    elif len(professor) > 50:
+        flash('This name is too long. Please enter a shorter name.', 'error')
+        grades = []
+    elif not professor.isalpha():
+        flash('Professor names can only contain letters.', 'error')
         grades = []
     else:
-        grades = professors.classes
+        professors = Professor.query.filter(
+            Professor.short_name.like(professor + "%")).first()
+        print(professors.__repr__())
+        if professors is None:
+            flash('No results were found for this professor.', category='error')
+            grades = []
+        else:
+            grades = professors.classes
     return render_template("home.html", grade_results=grades, form=form, source=source, url=url)
 
 
@@ -67,16 +77,17 @@ def result():
 
     print(f"{college}, {semester}, {year}")
 
-    grades = Grades.query.filter_by(college=college, semester=semester, year=year).all()
+    grades = Grades.query.filter_by(
+        college=college, semester=semester, year=year).all()
 
     if (grades):
         print("Records in database... retrieving from database...")
     else:
         print("Records not in database... retrieving from PDF...")
-        pdf_json = PdfParserDB(college, year, semester)
+        pdf_data = PdfParserDB(college, year, semester)
 
         try:
-            results = pdf_json.text_extractor()
+            results = pdf_data.text_extractor()
         except requests.exceptions.HTTPError:
             flash("There are no records for this semester.", category="error")
             return render_template("home.html", grade_results=[], form=form, source=source, url=url)
@@ -84,7 +95,8 @@ def result():
         grades = []
         for result in results:
 
-            professor = Professor.query.filter_by(short_name=result[21]).first()
+            professor = Professor.query.filter_by(
+                short_name=result[21]).first()
             if not professor:
                 professor = Professor(short_name=result[21], full_name="null")
                 db.session.add(professor)
@@ -92,8 +104,8 @@ def result():
                 db.session.commit()
 
             professor_id = professor.id
-                
-            new_grade = pdf_json.get_grade(result, professor_id)
+
+            new_grade = pdf_data.get_grade(result, professor_id)
 
             grades.append(new_grade)
 
@@ -102,8 +114,8 @@ def result():
 
     return render_template("home.html", grade_results=grades, form=form, source=source, url=url)
 
-    
+
 @views.errorhandler(404)
 def page_not_found(e):
     # note that we set the 404 status explicitly
-    return render_template("not_found.html")
+    return render_template("not_found.html"), 404
