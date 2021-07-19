@@ -12,9 +12,10 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     db.init_app(app)
 
-    from .views import views
+    from .views import views, page_not_found
 
     app.register_blueprint(views, url_prefix='/')
+    app.register_error_handler(404, page_not_found)
 
     from .models import Grades
 

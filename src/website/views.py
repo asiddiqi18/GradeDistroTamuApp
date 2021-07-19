@@ -7,8 +7,6 @@ from .forms import CourseForm
 from . import unittest_db
 views = Blueprint('views', __name__)
 
-# https://www.youtube.com/watch?v=dam0GPOAvVI
-
 
 @views.route('/')
 def home():
@@ -34,9 +32,12 @@ def professor():
     form = CourseForm(professor=professor)
     professors = Professor.query.filter(Professor.short_name.like(professor + "%")).first()
     print(professors.__repr__())
-    # if (len(professors) == 0):
-    #     flash('No results were found for this professor.', category='error')
-    return render_template("home.html", grade_results=professors.classes, form=form, source=source, url=url)
+    if professors is None:
+        flash('No results were found for this professor.', category='error')
+        grades = []
+    else:
+        grades = professors.classes
+    return render_template("home.html", grade_results=grades, form=form, source=source, url=url)
 
 
 @views.route('/test', methods=['GET'])
@@ -100,3 +101,9 @@ def result():
         db.session.commit()
 
     return render_template("home.html", grade_results=grades, form=form, source=source, url=url)
+
+    
+@views.errorhandler(404)
+def page_not_found(e):
+    # note that we set the 404 status explicitly
+    return render_template("not_found.html")
