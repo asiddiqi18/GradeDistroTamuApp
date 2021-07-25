@@ -47,7 +47,7 @@ def single_test(college, year, semester):
         return
     test_info = f" [college={college}, year={year}, semester={semester}] "
     logger.info(test_info.center(80, '='))
-    pdf_json = PdfParserDB(college, year, semester)
+    pdf_json = PdfParserDB(college, year, semester, store_pdfs=True)
     try:
         results = pdf_json.text_extractor()
 

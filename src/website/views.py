@@ -1,5 +1,9 @@
 from flask import Blueprint, render_template, request, flash
 import requests
+
+import plotly
+import plotly.express as px
+
 from .pdf_to_grades_parser import PdfParserDB
 from .models import Grades, Professor
 from . import db
@@ -25,29 +29,70 @@ def about():
 
 @views.route('/professors', methods=["GET", "POST"])
 def professor():
+
+    def render_default(flash_message, form, source, url):
+        flash(flash_message, 'error')
+        return render_template("prof.html", grade_results=[], form=form, source=source, url=url, averages=None, trend_year=None, trend_gpa=None)
+
     source = "professor"
     url = request.url
     professor = request.args.get('professor')
     form = CourseForm(professor=professor)
+
     if len(professor) < 3:
-        flash('This name is too short. Please enter a longer name.', 'error')
-        grades = []
+        return render_default('This name is too short. Please enter a longer name.', form, source, url)
+
     elif len(professor) > 50:
-        flash('This name is too long. Please enter a shorter name.', 'error')
-        grades = []
-    elif not professor.isalpha():
-        flash('Professor names can only contain letters.', 'error')
-        grades = []
+        return render_default('This name is too long. Please enter a shorter name.', form, source, url)
+
+    elif not all(x.isalpha() or x.isspace() for x in professor):
+        return render_default('Professor names can only contain letters.', form, source, url)
     else:
         professors = Professor.query.filter(
             Professor.short_name.like(professor + "%")).first()
-        print(professors.__repr__())
         if professors is None:
-            flash('No results were found for this professor.', category='error')
-            grades = []
+            return render_default('No results were found for this professor.', form, source, url)
+        
+    grades = professors.classes
+    
+    sum = 0
+    averages = Grades()
+    gpa_trend = {}
+
+    for grade in grades:
+        averages.merge(grade)
+        sum += grade.gpa
+        if grade.year not in gpa_trend:
+            total = grade.gpa
+            length = 1
         else:
-            grades = professors.classes
-    return render_template("home.html", grade_results=grades, form=form, source=source, url=url)
+            total, length = gpa_trend[grade.year]
+            total += grade.gpa
+            length += 1
+        gpa_trend[grade.year] = (total, length)
+
+    for key in gpa_trend.keys():
+        total, length = gpa_trend[key] 
+        gpa_trend[key] = float(total / length)
+
+    print(gpa_trend)
+
+    averages.retrieve_percents()
+    averages.gpa = sum / len(grades)
+    averages.instructor = grades[0].instructor
+
+    years = list(gpa_trend.keys())
+    gpas = list(gpa_trend.values())
+
+    zipped_lists = zip(years, gpas)
+
+    sorted_pairs = sorted(zipped_lists)
+
+    tuples = zip(*sorted_pairs)
+
+    years_sorted, gpas_sorted = [ list(tuple) for tuple in  tuples]
+
+    return render_template("prof.html", grade_results=grades, form=form, source=source, url=url, averages=averages, trend_year=years_sorted, trend_gpa=gpas_sorted)
 
 
 @views.route('/test', methods=['GET'])
