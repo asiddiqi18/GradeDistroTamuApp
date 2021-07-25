@@ -18,7 +18,7 @@ def home():
     source = "course"
     url = request.url
     print(url)
-    return render_template("home.html", grade_results=None, form=form, source=source, url=url)
+    return render_template("home.html", grade_results=None, form=form, url=url)
 
 
 @views.route('/about', methods=["GET"])
@@ -30,28 +30,25 @@ def about():
 @views.route('/professors', methods=["GET", "POST"])
 def professor():
 
-    def render_default(flash_message, form, source, url):
+    def render_default(flash_message, form, url):
         flash(flash_message, 'error')
-        return render_template("prof.html", grade_results=[], form=form, source=source, url=url, averages=None, trend_year=None, trend_gpa=None)
+        return render_template("prof.html", grade_results=[], form=form, url=url, averages=None, trend_year=None, trend_gpa=None)
 
-    source = "professor"
     url = request.url
     professor = request.args.get('professor')
     form = CourseForm(professor=professor)
 
     if len(professor) < 3:
-        return render_default('This name is too short. Please enter a longer name.', form, source, url)
-
+        return render_default('This name is too short. Please enter a longer name.', form, url)
     elif len(professor) > 50:
-        return render_default('This name is too long. Please enter a shorter name.', form, source, url)
-
+        return render_default('This name is too long. Please enter a shorter name.', form, url)
     elif not all(x.isalpha() or x.isspace() for x in professor):
-        return render_default('Professor names can only contain letters.', form, source, url)
+        return render_default('Professor names can only contain letters.', form, url)
     else:
         professors = Professor.query.filter(
             Professor.short_name.like(professor + "%")).first()
         if professors is None:
-            return render_default('No results were found for this professor.', form, source, url)
+            return render_default('No results were found for this professor.', form, url)
         
     grades = professors.classes
     
@@ -92,7 +89,7 @@ def professor():
 
     years_sorted, gpas_sorted = [ list(tuple) for tuple in  tuples]
 
-    return render_template("prof.html", grade_results=grades, form=form, source=source, url=url, averages=averages, trend_year=years_sorted, trend_gpa=gpas_sorted)
+    return render_template("prof.html", grade_results=grades, form=form, url=url, averages=averages, trend_year=years_sorted, trend_gpa=gpas_sorted)
 
 
 @views.route('/test', methods=['GET'])
@@ -113,7 +110,6 @@ def test_single():
 
 @views.route('/results', methods=["GET", "POST"])
 def result():
-    source = "course"
     url = request.url
     college = request.args.get('college').lower()
     semester = request.args.get('semester').lower()
@@ -135,7 +131,7 @@ def result():
             results = pdf_data.text_extractor()
         except requests.exceptions.HTTPError:
             flash("There are no records for this semester.", category="error")
-            return render_template("home.html", grade_results=[], form=form, source=source, url=url)
+            return render_template("home.html", grade_results=[], form=form, url=url)
 
         grades = []
         for result in results:
@@ -157,7 +153,7 @@ def result():
         db.session.add_all(grades)
         db.session.commit()
 
-    return render_template("home.html", grade_results=grades, form=form, source=source, url=url)
+    return render_template("home.html", grade_results=grades, form=form, url=url)
 
 
 @views.errorhandler(404)
