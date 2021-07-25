@@ -120,7 +120,7 @@
                 <td>{{ grade.amount_F }} <div class="text-muted">({{ "%.2f"|format(grade.percent_F) }})%</div>
                 </td>
                 <td>{{ "%.3f"|format(grade.gpa) }}</td>
-                <td>{{ grade.instructor }}</td>
+                <td><a href="{{ url_for('views.professor', professor=grade.instructor) }}">{{ grade.instructor }}</a></td>
             </tr>
             {% endfor %}
         </tbody>

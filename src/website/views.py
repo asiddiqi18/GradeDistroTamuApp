@@ -42,7 +42,7 @@ def professor():
         return render_default('This name is too short. Please enter a longer name.', form, url)
     elif len(professor) > 50:
         return render_default('This name is too long. Please enter a shorter name.', form, url)
-    elif not all(x.isalpha() or x.isspace() for x in professor):
+    elif not all(x.isalpha() or x.isspace() or x=='-' for x in professor):
         return render_default('Professor names can only contain letters.', form, url)
     else:
         professors = Professor.query.filter(
@@ -55,10 +55,12 @@ def professor():
     sum = 0
     averages = Grades()
     gpa_trend = {}
+    courses_taught = set()
 
     for grade in grades:
         averages.merge(grade)
         sum += grade.gpa
+        courses_taught.add(f"{grade.department} {grade.course}")
         if grade.year not in gpa_trend:
             total = grade.gpa
             length = 1
@@ -72,7 +74,7 @@ def professor():
         total, length = gpa_trend[key] 
         gpa_trend[key] = float(total / length)
 
-    print(gpa_trend)
+    courses_taught = ", ".join(sorted(courses_taught))
 
     averages.retrieve_percents()
     averages.gpa = sum / len(grades)
@@ -89,7 +91,7 @@ def professor():
 
     years_sorted, gpas_sorted = [ list(tuple) for tuple in  tuples]
 
-    return render_template("prof.html", grade_results=grades, form=form, url=url, averages=averages, trend_year=years_sorted, trend_gpa=gpas_sorted)
+    return render_template("prof.html", grade_results=grades, form=form, url=url, averages=averages, trend_year=years_sorted, trend_gpa=gpas_sorted, courses=courses_taught)
 
 
 @views.route('/test', methods=['GET'])
