@@ -1,15 +1,10 @@
 from datetime import date
-import pathlib
-import sqlite3
-from sqlite3 import Error
 from . import db
 import requests
 from .models import Grades, Professor
-from pdf_parser import PdfParser
 
-
-from pdf_parser import get_colleges
-from website.pdf_to_grades_parser import PdfParserDB
+from ..pdf_parser import get_colleges
+from .pdf_to_grades_parser import PdfParserDB
 import logging
 
 # PdfParser.clean()

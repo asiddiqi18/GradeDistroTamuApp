@@ -1,6 +1,5 @@
-from pdf_parser import PdfParser
+from ..pdf_parser import PdfParser, parent_dir
 from .models import Grades
-import pdf_parser
 import pathlib
 
 class PdfParserDB(PdfParser):

@@ -6,7 +6,7 @@ import pathlib
 from wtforms.fields.core import StringField
 from wtforms.validators import InputRequired
 
-from pdf_parser import get_colleges
+from ..pdf_parser import get_colleges
   
 # creating the date object of today's date
 todays_date = date.today()
