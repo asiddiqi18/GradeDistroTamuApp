@@ -3,7 +3,7 @@ from . import db
 import requests
 from .models import Grades, Professor
 
-from ..pdf_parser import get_colleges
+from ..parser_api.pdf_parser import get_colleges
 from .pdf_to_grades_parser import PdfParserDB
 import logging
 

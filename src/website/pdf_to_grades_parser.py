@@ -1,4 +1,4 @@
-from ..pdf_parser import PdfParser, parent_dir
+from ..parser_api.pdf_parser import PdfParser, parent_dir
 from .models import Grades
 import pathlib
 

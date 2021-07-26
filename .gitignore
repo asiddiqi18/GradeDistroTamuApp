@@ -146,4 +146,5 @@ src/website/static/MDB-Free_4.19.2
 src/pdf
 src/shelf
 src/json
+src/tests/quick.py
 # End of https://www.toptal.com/developers/gitignore/api/python

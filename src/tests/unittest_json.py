@@ -1,5 +1,5 @@
 from datetime import date
-from pdf_parser import *
+from ..parser_api.pdf_parser import *
 import logging
 logging.basicConfig(filename="debug-report.log", filemode='a', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 logger=logging.getLogger() 

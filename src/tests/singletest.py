@@ -1,4 +1,4 @@
-from pdf_parser import *
+from ..parser_api.pdf_parser import *
 
 
 # PdfParser.clean()
