@@ -12,7 +12,6 @@ views = Blueprint('views', __name__)
 @views.route('/')
 def home():
     form = CourseForm()
-    source = "course"
     url = request.url
     print(url)
     return render_template("home.html", grade_results=None, form=form, url=url)
@@ -112,10 +111,11 @@ def result():
     url = request.url
     college = request.args.get('college').lower()
     semester = request.args.get('semester').lower()
-    year = request.args.get('year')
+    year = request.args.get('year').lower()
     form = CourseForm(college=college, semester=semester, year=year)
 
     print(f"{college}, {semester}, {year}")
+    print(form)
 
     grades = Grades.query.filter_by(
         college=college, semester=semester, year=year).all()

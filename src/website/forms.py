@@ -22,7 +22,7 @@ abbreviations = get_colleges()
 colleges = []
 for college in abbreviations.keys():
     college_titled = college.title()
-    colleges.append((college_titled, college_titled))
+    colleges.append((college, college_titled))
 
 
 class CourseForm(FlaskForm):
