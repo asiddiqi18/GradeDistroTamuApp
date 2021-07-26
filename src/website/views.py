@@ -1,9 +1,6 @@
 from flask import Blueprint, render_template, request, flash
 import requests
 
-import plotly
-import plotly.express as px
-
 from .pdf_to_grades_parser import PdfParserDB
 from .models import Grades, Professor
 from . import db
