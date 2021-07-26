@@ -114,16 +114,13 @@ def result():
     year = request.args.get('year').lower()
     form = CourseForm(college=college, semester=semester, year=year)
 
-    print(f"{college}, {semester}, {year}")
-    print(form)
 
     grades = Grades.query.filter_by(
         college=college, semester=semester, year=year).all()
 
     if (grades):
-        print("Records in database... retrieving from database...")
+        pass
     else:
-        print("Records not in database... retrieving from PDF...")
         pdf_data = PdfParserDB(college, year, semester)
 
         try:
