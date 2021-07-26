@@ -142,7 +142,7 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# src/website/static/MDB-Free_4.19.2
+src/website/static/MDB-Free_4.19.2
 src/pdf
 src/shelf
 src/json
