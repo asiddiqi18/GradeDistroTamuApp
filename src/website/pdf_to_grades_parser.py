@@ -67,7 +67,7 @@ class PdfParserDB(PdfParser):
       
     @staticmethod
     def clean():
-        dir_path = pdf_parser.parent_dir / pathlib.Path("grades.db")
+        dir_path = parent_dir / pathlib.Path("grades.db")
         if dir_path.exists():
             dir_path.unlink()
         # super().clean()
