@@ -9,7 +9,7 @@ from ..parser_api.college_lookup import get_colleges
 
 views = Blueprint('views', __name__)
 colleges_json = get_colleges()
-semesters = {'spring', 'summer', 'fall'}
+semesters = {'spring', 'summer', 'fall', 'all'}
 
 
 @views.route('/')
@@ -132,16 +132,22 @@ def colleges_result():
         print(f"ERROR MESSAGE CAUGHT! {error_msg}")
         return render_default(error_msg, form, url)
 
-    grades = Grades.query.filter_by(
-        college=college, semester=semester, year=year).all()
+    grades = Grades
+
+    if college != 'all':
+        grades = grades.query.filter_by(college=college)
+    if semester != 'all':
+        grades = grades.filter_by(semester=semester)
+    if year != 'all':
+        grades = grades.filter_by(year=year)
+    grades = grades.all()
 
     if not grades:  # no records exist
         try:
             pdf_data = PdfParserDB(college, int(year), semester)
             grades = pdf_data.get_grades_obj()
         except requests.exceptions.HTTPError:
-            flash("There are no records for this semester.", category="error")
-            return render_default(error_msg, form, url)
+            return render_default("There are no records for this semester.", form, url)
 
         db.session.add_all(grades)
         db.session.commit()
