@@ -1,14 +1,15 @@
 from flask import Blueprint, render_template, request, flash
 import requests
-
+from datetime import date
 from ..parser_api.pdf_parser_model import PdfParserDB
 from .models import Grades, Professor
 from . import db
 from .forms import CourseForm
-
-
+from ..parser_api.college_lookup import get_colleges
 
 views = Blueprint('views', __name__)
+colleges_json = get_colleges()
+semesters = {'spring', 'summer', 'fall'}
 
 
 @views.route('/')
@@ -25,6 +26,15 @@ def about():
     return render_template("about.html", url=url)
 
 
+def handle_invalid_prof_params(prof):
+    if len(prof) < 3:
+        return 'This name is too short. Please enter a longer name.'
+    if len(prof) > 50:
+        return 'This name is too long. Please enter a shorter name.'
+    if not all(x.isalpha() or x.isspace() or x == '-' for x in prof):
+        return 'Professor names can only contain letters.'
+
+
 @views.route('/professors', methods=["GET", "POST"])
 def professor():
     def render_default(flash_message, _form, _url):
@@ -36,17 +46,15 @@ def professor():
     professor_request = request.args.get('professor')
     form = CourseForm(professor=professor_request)
 
-    if len(professor_request) < 3:
-        return render_default('This name is too short. Please enter a longer name.', form, url)
-    elif len(professor_request) > 50:
-        return render_default('This name is too long. Please enter a shorter name.', form, url)
-    elif not all(x.isalpha() or x.isspace() or x == '-' for x in professor_request):
-        return render_default('Professor names can only contain letters.', form, url)
-    else:
-        professors = Professor.query.filter(
-            Professor.short_name.like(professor_request + "%")).first()
-        if professors is None:
-            return render_default('No results were found for this professor.', form, url)
+    error_msg = handle_invalid_prof_params(professor_request)
+
+    if error_msg:
+        return render_default(error_msg, form, url)
+
+    professors = Professor.query.filter(
+        Professor.short_name.like(professor_request + "%")).first()
+    if professors is None:
+        return render_default('No results were found for this professor.', form, url)
 
     grades = professors.classes
 
@@ -82,24 +90,47 @@ def professor():
     gpa_list = list(gpa_trend.values())
 
     zipped_lists = zip(years, gpa_list)
-
     sorted_pairs = sorted(zipped_lists)
-
     tuples = zip(*sorted_pairs)
-
     years_sorted, gpa_sorted = [list(tup) for tup in tuples]
 
     return render_template("prof.html", grade_results=grades, form=form, url=url, averages=averages,
                            trend_year=years_sorted, trend_gpa=gpa_sorted, courses=courses_taught)
 
 
+def handle_invalid_college_params(college, semester, year):
+    if not year.isdigit():
+        return "This is an invalid entry for year."
+    year = int(year)
+    if year < 2016:
+        return "Records do not go this back."
+    if year > date.today().year:
+        return "This year is in the future."
+    if semester not in semesters:
+        return "This is not a valid semester."
+    if college not in colleges_json:
+        return "This is not a valid college."
+
+
 @views.route('/results', methods=["GET", "POST"])
-def result():
+def colleges_result():
+    def render_default(flash_message, _form, _url):
+        flash(flash_message, 'error')
+        return render_template("home.html", grade_results=[], form=form, url=url)
+
     url = request.url
     college = request.args.get('college').lower()
     semester = request.args.get('semester').lower()
     year = request.args.get('year').lower()
     form = CourseForm(college=college, semester=semester, year=year)
+
+    print("VALIDATING!")
+    print(request.args)
+    error_msg = handle_invalid_college_params(college, semester, year)
+
+    if error_msg:
+        print(f"ERROR MESSAGE CAUGHT! {error_msg}")
+        return render_default(error_msg, form, url)
 
     grades = Grades.query.filter_by(
         college=college, semester=semester, year=year).all()
@@ -110,10 +141,7 @@ def result():
             grades = pdf_data.get_grades_obj()
         except requests.exceptions.HTTPError:
             flash("There are no records for this semester.", category="error")
-            return render_template("home.html", grade_results=[], form=form, url=url)
-        except ValueError:
-            flash(f"Please enter a valid year.", category="error")
-            return render_template("home.html", grade_results=[], form=form, url=url)
+            return render_default(error_msg, form, url)
 
         db.session.add_all(grades)
         db.session.commit()
