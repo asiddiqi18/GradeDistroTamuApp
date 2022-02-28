@@ -1,6 +1,3 @@
-from enum import unique
-
-from sqlalchemy.orm import backref
 from . import db
 
 
@@ -64,7 +61,8 @@ class Grades(db.Model):
 
     def __repr__(self):
         return f'''<Grades: [
-            College: {self.college} Year: {self.year},  Semester: {self.semester},  Department: {self.department},  Course: {self.course},  GPA: {self.gpa}, Instructor: {self.instructor}]>'''
+            College: {self.college} Year: {self.year},  Semester: {self.semester},  Department: {self.department}, 
+            Course: {self.course},  GPA: {self.gpa}, Instructor: {self.instructor}]>'''
 
 
 class Professor(db.Model):

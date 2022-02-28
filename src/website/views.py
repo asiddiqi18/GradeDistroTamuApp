@@ -5,7 +5,8 @@ from ..parser_api.pdf_parser_model import PdfParserDB
 from .models import Grades, Professor
 from . import db
 from .forms import CourseForm
-from . import unittest_db
+
+
 
 views = Blueprint('views', __name__)
 
@@ -26,9 +27,9 @@ def about():
 
 @views.route('/professors', methods=["GET", "POST"])
 def professor():
-    def render_default(flash_message, form, url):
+    def render_default(flash_message, _form, _url):
         flash(flash_message, 'error')
-        return render_template("prof.html", grade_results=[], form=form, url=url, averages=None, trend_year=None,
+        return render_template("prof.html", grade_results=[], form=_form, url=_url, averages=None, trend_year=None,
                                trend_gpa=None)
 
     url = request.url
@@ -92,22 +93,6 @@ def professor():
                            trend_year=years_sorted, trend_gpa=gpa_sorted, courses=courses_taught)
 
 
-@views.route('/test', methods=['GET'])
-def test_unit():
-    print("Starting unit tests...")
-    unittest_db.unit_test()
-    print("Finished unit tests!")
-    return "Finished unit tests!"
-
-
-@views.route('/test_single', methods=['GET'])
-def test_single():
-    print("Starting unit tests...")
-    unittest_db.single_test("engineering", 2021, "spring")
-    print("Finished unit tests!")
-    return "Finished single test!"
-
-
 @views.route('/results', methods=["GET", "POST"])
 def result():
     url = request.url
@@ -119,14 +104,15 @@ def result():
     grades = Grades.query.filter_by(
         college=college, semester=semester, year=year).all()
 
-    if grades:
-        pass
-    else:  # no records exist
-        pdf_data = PdfParserDB(college, year, semester)
+    if not grades:  # no records exist
         try:
+            pdf_data = PdfParserDB(college, int(year), semester)
             grades = pdf_data.get_grades_obj()
         except requests.exceptions.HTTPError:
             flash("There are no records for this semester.", category="error")
+            return render_template("home.html", grade_results=[], form=form, url=url)
+        except ValueError:
+            flash(f"Please enter a valid year.", category="error")
             return render_template("home.html", grade_results=[], form=form, url=url)
 
         db.session.add_all(grades)
@@ -136,6 +122,6 @@ def result():
 
 
 @views.errorhandler(404)
-def page_not_found(e):
+def page_not_found():
     # note that we set the 404 status explicitly
     return render_template("not_found.html"), 404

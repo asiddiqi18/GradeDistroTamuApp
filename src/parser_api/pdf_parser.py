@@ -1,8 +1,7 @@
 import requests
 import pathlib
 import re
-import shelve
-from PyPDF2 import PdfFileReader
+import PyPDF2
 import json
 import logging
 import shutil
@@ -39,7 +38,7 @@ class PdfParser:
         r'(\D{4})-(\d{3,4})-(\d{3})\s+(\d+.\d+)\s+(\S+\s\w)\s(\d+.\d+)%\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+('
         r'\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+.\d+)%\s+(\d+.\d+)%\s+(\d+.\d+)%\s+(\d+.\d+)%')
 
-    def __init__(self, college, year, semester, store_pdfs=False):
+    def __init__(self, college: str, year: int, semester: str, store_pdfs=False):
         self.college = college
         self.year = year
         self.semester = semester
@@ -121,11 +120,13 @@ class PdfParser:
             logging.info("No PDF file has been downloaded. Downloading now...")
             self.download_pdf()
 
+        logging.info("Extracting PDF...")
+
         # Otherwise, use regex pattern to extract information
         # Regex patterns precompiled above.
         results = []
         with open(self.pdf_path, 'rb') as f:
-            pdf = PdfFileReader(f)
+            pdf = PyPDF2.PdfFileReader(f)
             number_of_pages = pdf.getNumPages()
 
             for p in range(number_of_pages):
@@ -144,13 +145,15 @@ class PdfParser:
         # Depending on setting put in constructor, delete PDF from computer after extracting its text
         if not self.store_pdfs:
             pathlib.Path.unlink(self.pdf_path)
+
+        logging.info("Finished extracting!")
         return results
 
     def get_dictionary(self):
         """ Serializes the PDF results to Python dictionary object """
         list_of_courses = self.text_extractor()
         if len(list_of_courses) == 0:
-            logging.warn("No courses were found.")
+            logging.warning("No courses were found.")
             return None
 
         results_dict = {}
@@ -168,9 +171,6 @@ class PdfParser:
             grade_amount = {}
             grade_percentage = {}
             other = {}
-            total = None
-            gpa = None
-            professor = None
 
             if not self.alt:
                 grade_amount['A'] = result[3]
@@ -235,12 +235,12 @@ class PdfParser:
     def clean():
         """ Static method to delete all local files related to this API. Useful for testing. """
         dir_names = ["json", "pdf"]
-        for dir in dir_names:
-            dir_path = parent_dir / pathlib.Path(dir)
+        for d in dir_names:
+            dir_path = parent_dir / pathlib.Path(d)
             if dir_path.is_dir():
                 folder = str(dir_path)
                 shutil.rmtree(folder)
-                logging.info("Successfully deleted %s" % dir)
+                logging.info("Successfully deleted %s" % d)
 
     def save_json(self):
         """
@@ -262,7 +262,6 @@ class PdfParser:
 
     def get_json_obj(self):
         """ Get JSON object of data """
-        results = self.text_extractor()
 
         logging.info("Converting content to JSON...")
         # convert dictionary to json

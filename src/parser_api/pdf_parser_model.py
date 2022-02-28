@@ -7,7 +7,7 @@ from ..website import db
 
 class PdfParserDB(PdfParser):
 
-    def __init__(self, college, year, semester):
+    def __init__(self, college: str, year: int, semester: str):
         super().__init__(college, year, semester, True)
 
     def get_grades_obj(self):
