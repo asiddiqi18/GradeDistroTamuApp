@@ -1,11 +1,12 @@
 from flask import Blueprint, render_template, request, flash
 import requests
 
-from .pdf_to_grades_parser import PdfParserDB
+from ..parser_api.pdf_parser_model import PdfParserDB
 from .models import Grades, Professor
 from . import db
 from .forms import CourseForm
 from . import unittest_db
+
 views = Blueprint('views', __name__)
 
 
@@ -25,37 +26,37 @@ def about():
 
 @views.route('/professors', methods=["GET", "POST"])
 def professor():
-
     def render_default(flash_message, form, url):
         flash(flash_message, 'error')
-        return render_template("prof.html", grade_results=[], form=form, url=url, averages=None, trend_year=None, trend_gpa=None)
+        return render_template("prof.html", grade_results=[], form=form, url=url, averages=None, trend_year=None,
+                               trend_gpa=None)
 
     url = request.url
-    professor = request.args.get('professor')
-    form = CourseForm(professor=professor)
+    professor_request = request.args.get('professor')
+    form = CourseForm(professor=professor_request)
 
-    if len(professor) < 3:
+    if len(professor_request) < 3:
         return render_default('This name is too short. Please enter a longer name.', form, url)
-    elif len(professor) > 50:
+    elif len(professor_request) > 50:
         return render_default('This name is too long. Please enter a shorter name.', form, url)
-    elif not all(x.isalpha() or x.isspace() or x=='-' for x in professor):
+    elif not all(x.isalpha() or x.isspace() or x == '-' for x in professor_request):
         return render_default('Professor names can only contain letters.', form, url)
     else:
         professors = Professor.query.filter(
-            Professor.short_name.like(professor + "%")).first()
+            Professor.short_name.like(professor_request + "%")).first()
         if professors is None:
             return render_default('No results were found for this professor.', form, url)
-        
+
     grades = professors.classes
-    
-    sum = 0
+
+    sum_gpa = 0
     averages = Grades()
     gpa_trend = {}
     courses_taught = set()
 
     for grade in grades:
         averages.merge(grade)
-        sum += grade.gpa
+        sum_gpa += grade.gpa
         courses_taught.add(f"{grade.department} {grade.course}")
         if grade.year not in gpa_trend:
             total = grade.gpa
@@ -67,27 +68,28 @@ def professor():
         gpa_trend[grade.year] = (total, length)
 
     for key in gpa_trend.keys():
-        total, length = gpa_trend[key] 
+        total, length = gpa_trend[key]
         gpa_trend[key] = float(total / length)
 
     courses_taught = ", ".join(sorted(courses_taught))
 
     averages.retrieve_percents()
-    averages.gpa = sum / len(grades)
+    averages.gpa = sum_gpa / len(grades)
     averages.instructor = grades[0].instructor
 
     years = list(gpa_trend.keys())
-    gpas = list(gpa_trend.values())
+    gpa_list = list(gpa_trend.values())
 
-    zipped_lists = zip(years, gpas)
+    zipped_lists = zip(years, gpa_list)
 
     sorted_pairs = sorted(zipped_lists)
 
     tuples = zip(*sorted_pairs)
 
-    years_sorted, gpas_sorted = [ list(tuple) for tuple in  tuples]
+    years_sorted, gpa_sorted = [list(tup) for tup in tuples]
 
-    return render_template("prof.html", grade_results=grades, form=form, url=url, averages=averages, trend_year=years_sorted, trend_gpa=gpas_sorted, courses=courses_taught)
+    return render_template("prof.html", grade_results=grades, form=form, url=url, averages=averages,
+                           trend_year=years_sorted, trend_gpa=gpa_sorted, courses=courses_taught)
 
 
 @views.route('/test', methods=['GET'])
@@ -114,37 +116,18 @@ def result():
     year = request.args.get('year').lower()
     form = CourseForm(college=college, semester=semester, year=year)
 
-
     grades = Grades.query.filter_by(
         college=college, semester=semester, year=year).all()
 
-    if (grades):
+    if grades:
         pass
-    else:
+    else:  # no records exist
         pdf_data = PdfParserDB(college, year, semester)
-
         try:
-            results = pdf_data.text_extractor()
+            grades = pdf_data.get_grades_obj()
         except requests.exceptions.HTTPError:
             flash("There are no records for this semester.", category="error")
             return render_template("home.html", grade_results=[], form=form, url=url)
-
-        grades = []
-        for result in results:
-
-            professor = Professor.query.filter_by(
-                short_name=result[21]).first()
-            if not professor:
-                professor = Professor(short_name=result[21], full_name="null")
-                db.session.add(professor)
-                db.session.flush()
-                db.session.commit()
-
-            professor_id = professor.id
-
-            new_grade = pdf_data.get_grade(result, professor_id)
-
-            grades.append(new_grade)
 
         db.session.add_all(grades)
         db.session.commit()

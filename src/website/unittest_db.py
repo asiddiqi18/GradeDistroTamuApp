@@ -4,7 +4,6 @@ import requests
 from .models import Grades, Professor
 
 from ..parser_api.pdf_parser import get_colleges
-from .pdf_to_grades_parser import PdfParserDB
 import logging
 
 # PdfParser.clean()

@@ -3,6 +3,7 @@ from enum import unique
 from sqlalchemy.orm import backref
 from . import db
 
+
 # https://www.tutorialspoint.com/sqlalchemy/sqlalchemy_core_creating_table.htm
 
 
@@ -42,10 +43,7 @@ class Grades(db.Model):
         self.amount_D = 0
         self.amount_F = 0
         self.total_A_F = 0
-
         self.other_Q = 0
-        pass
-
 
     def merge(self, other):
         self.amount_A += other.amount_A
@@ -55,7 +53,6 @@ class Grades(db.Model):
         self.amount_F += other.amount_F
         self.other_Q += other.other_Q
         self.total_A_F += other.total_A_F
-
 
     def retrieve_percents(self):
         total = self.total_A_F

@@ -7,25 +7,12 @@ import json
 import logging
 import shutil
 
-
-# Setup logging for debugging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-# Currently disabled
-# logging.disable(logging.INFO)
-
 # Get the directory this file is in, as pathlib object.
 parent_dir = pathlib.Path(__file__).parent.absolute()
 
-# Regex to extract info from PDF binaries.
-# regex_main is used for most retrievals 
-regex_main = re.compile(r'(\D{4})-(\d{3,4})-(\d{3})\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+(\d+.\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\S+\s\w)')
-
-# However, most PDFs from 2016 are formatted slightly different, requiring an alternative pattern
-regex_alt = re.compile(r'(\D{4})-(\d{3,4})-(\d{3})\s+(\d+.\d+)\s+(\S+\s\w)\s(\d+.\d+)%\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+.\d+)%\s+(\d+.\d+)%\s+(\d+.\d+)%\s+(\d+.\d+)%')    
-
 
 def get_colleges():
-    ''' From college_abbreviations.json, retrieve mapping of colleges to abbreviations as JSON. '''
+    """ From college_abbreviations.json, retrieve mapping of colleges to abbreviations as JSON. """
     abb_dir = parent_dir / pathlib.Path("college_abbreviations.json")
     with open(str(abb_dir), 'r') as file:
         abbreviations = json.load(file)
@@ -33,7 +20,24 @@ def get_colleges():
 
 
 class PdfParser:
-    ''' API to parse PDFs from the grade distrubition registrar '''
+    """ API to parse PDFs from the grade distribution registrar """
+
+    # Setup logging for debugging
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+    # Currently disabled
+    # logging.disable(logging.INFO)
+
+    # Regex to extract info from PDF binaries.
+    # regex_main is used for most retrievals
+    regex_main = re.compile(
+        r'(\D{4})-(\d{3,4})-(\d{3})\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+('
+        r'\d+.\d+)%\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+(\d+.\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+('
+        r'\S+\s\w)')
+
+    # However, most PDFs from 2016 are formatted slightly different, requiring an alternative pattern
+    regex_alt = re.compile(
+        r'(\D{4})-(\d{3,4})-(\d{3})\s+(\d+.\d+)\s+(\S+\s\w)\s(\d+.\d+)%\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+('
+        r'\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+.\d+)%\s+(\d+.\d+)%\s+(\d+.\d+)%\s+(\d+.\d+)%')
 
     def __init__(self, college, year, semester, store_pdfs=False):
         self.college = college
@@ -49,38 +53,36 @@ class PdfParser:
         # Validate parameters
         abbreviation_dict = get_colleges()
         if self.college.lower() not in abbreviation_dict:
-            raise ValueError("College '%s' not identified. Enter one of these following colleges: %s" % (self.college, ", ".join(list(abbreviation_dict.keys()))))
+            raise ValueError("College '%s' not identified. Enter one of these following colleges: %s" % (
+                self.college, ", ".join(list(abbreviation_dict.keys()))))
         if int(self.year) < 2016:
             raise ValueError("Data for years before 2016 do not exist!")
         if self.semester not in self.semesters:
-            raise ValueError("Semester '%s' not identified. Enter one of the following semesters: %s" % ", ".join(self.semesters))
-                    
+            raise ValueError(
+                "Semester '%s' not identified".join(self.semesters))
 
     def file_name(self):
-        ''' Generate a safe file name for the PDF from the parameters '''
-        filename = ("%s_%s_%s") % (self.college, self.year, self.semester)
+        """ Generate a safe file name for the PDF from the parameters """
+        filename = "%s_%s_%s" % (self.college, self.year, self.semester)
         dangerous_chars = [' ', '/']
         for danger in dangerous_chars:
             filename = filename.replace(danger, "_")
         return filename
 
-
     def semester_to_numeric_code(self):
-        ''' Get the numerical coding used for the URL from the semester '''
+        """ Get the numerical coding used for the URL from the semester """
         return self.semesters[self.semester]
 
-    
     def get_college_abbreviation(self):
         abbreviation_dict = get_colleges()
         return abbreviation_dict[self.college.lower()]
 
-
     def download_pdf(self):
-        '''
+        """
             Downloads grade reports to current directory from web
             Saves PDF to '../pdf'
             Returns path of downloaded PDF / existing PDF
-        '''
+        """
 
         # Get/create directory for PDFs, and get path of the pdf that will be downloaded/is saved
         file_name = self.file_name() + ".pdf"
@@ -94,46 +96,30 @@ class PdfParser:
             abbreviation = self.get_college_abbreviation()
             year_semester = str(self.year) + str(self.semester_to_numeric_code())
 
-            url = 'https://web-as.tamu.edu/GradeReports/PDFReports/%s/grd%s%s.pdf' % (year_semester, year_semester, abbreviation)
+            url = 'https://web-as.tamu.edu/GradeReports/PDFReports/%s/grd%s%s.pdf' % (
+                year_semester, year_semester, abbreviation)
 
-            res = requests.get(url) 
+            res = requests.get(url)
             res.raise_for_status()
 
             # write as binary
             with open(pdf_path, 'wb') as f:
                 f.write(res.content)
-        
+
         # save the path of the PDF as a field
         self.pdf_path = pdf_path
 
-
     def text_extractor(self):
-        '''
+        """
             Parses the grade distribution PDF for its information using regex pattern.
             Returns a 2D list, structured in a tabular way.
             What index corresponds to what value depends on the type of pattern used.
-        '''
+        """
 
         # If this function is called without downloading the PDF first, then download the PDF
-        if (self.pdf_path is None):
+        if self.pdf_path is None:
             logging.info("No PDF file has been downloaded. Downloading now...")
             self.download_pdf()
-
-        # I used the shelf module to store the results of this text extractor into file, so that
-        # future calls can save time from going through the pattern again.
-
-        # Get/create a directory for storing shelves.
-        shelf_dir = parent_dir / pathlib.Path("shelf")
-        shelf_dir.mkdir(parents=True, exist_ok=True)
-        # Get path for shelf about to be created and open shelf
-        shelf_file = shelf_dir / pathlib.Path(self.file_name())
-        shelf = shelve.open(str(shelf_file))
-
-        # If there already exists a shelf with data in it, then get results from that
-        if 'data' in shelf:
-            results = shelf['data']
-            shelf.close()
-            return results
 
         # Otherwise, use regex pattern to extract information
         # Regex patterns precompiled above.
@@ -141,34 +127,29 @@ class PdfParser:
         with open(self.pdf_path, 'rb') as f:
             pdf = PdfFileReader(f)
             number_of_pages = pdf.getNumPages()
-            
+
             for p in range(number_of_pages):
                 page = pdf.getPage(p)
                 text = page.extractText()
-                regex_result = regex_main.findall(text)
+                regex_result = self.regex_main.findall(text)
                 # If this regex pattern did not yield anything, then try using the alternative regex pattern
                 if len(regex_result) == 0:
-                    regex_result = regex_alt.findall(text)
+                    regex_result = self.regex_alt.findall(text)
                     if len(regex_result) != 0:
-                        self.alt = True # Designate that alternative pattern was used for future uses
+                        self.alt = True  # Designate that alternative pattern was used for future uses
 
                 # Append all results to a master list
                 results.extend(regex_result)
-
-            # Save this master list to shelf for future.
-            shelf['data'] = results
-            shelf.close()
 
         # Depending on setting put in constructor, delete PDF from computer after extracting its text
         if not self.store_pdfs:
             pathlib.Path.unlink(self.pdf_path)
         return results
 
-
     def get_dictionary(self):
-        ''' Serializes the PDF results to Python dictionary object '''
+        """ Serializes the PDF results to Python dictionary object """
         list_of_courses = self.text_extractor()
-        if (len(list_of_courses) == 0):
+        if len(list_of_courses) == 0:
             logging.warn("No courses were found.")
             return None
 
@@ -176,8 +157,9 @@ class PdfParser:
 
         for result in list_of_courses:
 
-            if (len(result) != self.arg_expect_amount):
-                raise RuntimeError("Incorrect number of attributes in course info. Got %d, expected %d.", len(result), self.arg_expect_amount)
+            if len(result) != self.arg_expect_amount:
+                raise RuntimeError("Incorrect number of attributes in course info. Got %d, expected %d.", len(result),
+                                   self.arg_expect_amount)
 
             department = result[0]
             course = result[1]
@@ -240,19 +222,19 @@ class PdfParser:
                 "professor": professor
             }
 
-            if (department not in results_dict):
+            if department not in results_dict:
                 results_dict[department] = {}
-            if (course not in results_dict[department]):
+            if course not in results_dict[department]:
                 results_dict[department][course] = {}
 
             results_dict[department][course][section] = section_dict
 
-        return results_dict   
+        return results_dict
 
     @staticmethod
     def clean():
-        ''' Static method to delete all local files related to this API. Useful for testing. '''
-        dir_names = ["shelf", "json", "pdf"]
+        """ Static method to delete all local files related to this API. Useful for testing. """
+        dir_names = ["json", "pdf"]
         for dir in dir_names:
             dir_path = parent_dir / pathlib.Path(dir)
             if dir_path.is_dir():
@@ -260,12 +242,11 @@ class PdfParser:
                 shutil.rmtree(folder)
                 logging.info("Successfully deleted %s" % dir)
 
-
     def save_json(self):
-        '''
+        """
             Downloads and parses a PDF file from TAMU grade distributions, provides a JSON file with results
             Return value is pathlib object for the output JSON.
-        '''
+        """
 
         if self.json is None:
             self.get_json_obj()
@@ -279,9 +260,8 @@ class PdfParser:
         logging.info("Saved to JSON!")
         return json_file
 
-
     def get_json_obj(self):
-        ''' Get JSON object of data '''
+        """ Get JSON object of data """
         results = self.text_extractor()
 
         logging.info("Converting content to JSON...")
@@ -293,4 +273,3 @@ class PdfParser:
 if __name__ == "__main__":
     pdf_json = PdfParser("engineering", "2021", "spring")
     pdf_json.save_json()
-
