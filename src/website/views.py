@@ -1,3 +1,4 @@
+import sqlalchemy.orm
 from flask import Blueprint, render_template, request, flash
 import requests
 from datetime import date
@@ -99,16 +100,17 @@ def professor():
 
 
 def handle_invalid_college_params(college, semester, year):
-    if not year.isdigit():
-        return "This is an invalid entry for year."
-    year = int(year)
-    if year < 2016:
-        return "Records do not go this back."
-    if year > date.today().year:
-        return "This year is in the future."
+    if year != 'all':
+        if not year.isdigit():
+            return "This is an invalid entry for year."
+        year = int(year)
+        if year < 2016:
+            return "Records do not go this back."
+        if year > date.today().year:
+            return "This year is in the future."
     if semester not in semesters:
         return "This is not a valid semester."
-    if college not in colleges_json:
+    if college != 'all' and college not in colleges_json:
         return "This is not a valid college."
 
 
@@ -132,15 +134,16 @@ def colleges_result():
         print(f"ERROR MESSAGE CAUGHT! {error_msg}")
         return render_default(error_msg, form, url)
 
-    grades = Grades
+    grades_query: sqlalchemy.orm.Query = Grades.query
 
     if college != 'all':
-        grades = grades.query.filter_by(college=college)
+        grades_query = grades_query.filter_by(college=college)
     if semester != 'all':
-        grades = grades.filter_by(semester=semester)
+        grades_query = grades_query.filter_by(semester=semester)
     if year != 'all':
-        grades = grades.filter_by(year=year)
-    grades = grades.all()
+        grades_query = grades_query.filter_by(year=year)
+
+    grades = grades_query.all()
 
     if not grades:  # no records exist
         try:

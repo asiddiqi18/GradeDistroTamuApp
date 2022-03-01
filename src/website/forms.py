@@ -21,7 +21,7 @@ for i in reversed(range(year_start, year_end + 1)):
 
 abbreviations = get_colleges()
 
-colleges = [all]
+colleges = []
 for college in abbreviations.keys():
     college_titled = college.title()
     colleges.append((college, college_titled))
