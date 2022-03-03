@@ -99,7 +99,7 @@ def professor():
                            trend_year=years_sorted, trend_gpa=gpa_sorted, courses=courses_taught)
 
 
-def handle_invalid_college_params(college, semester, year):
+def handle_invalid_college_params(college, semester, year) -> str:
     if year != 'all':
         if not year.isdigit():
             return "This is an invalid entry for year."
@@ -114,6 +114,31 @@ def handle_invalid_college_params(college, semester, year):
         return "This is not a valid college."
 
 
+def get_grades(college, year, semester):
+    error_msg = handle_invalid_college_params(college, semester, year)
+
+    if error_msg:
+        raise ValueError(error_msg)
+
+    grades_query: sqlalchemy.orm.Query = Grades.query
+
+    grades_query = grades_query.filter_by(college=college, semester=semester, year=year)
+
+    grades = grades_query.all()
+
+    if not grades:  # no records exist
+        try:
+            pdf_data = PdfParserDB(college, int(year), semester)
+            grades = pdf_data.get_grades_obj()
+        except requests.exceptions.HTTPError:
+            raise ValueError("There are no records for this semester.")
+
+        db.session.add_all(grades)
+        db.session.commit()
+
+    return grades
+
+
 @views.route('/results', methods=["GET", "POST"])
 def colleges_result():
     def render_default(flash_message, _form, _url):
@@ -126,33 +151,10 @@ def colleges_result():
     year = request.args.get('year').lower()
     form = CourseForm(college=college, semester=semester, year=year)
 
-    print("VALIDATING!")
-    print(request.args)
-    error_msg = handle_invalid_college_params(college, semester, year)
-
-    if error_msg:
-        print(f"ERROR MESSAGE CAUGHT! {error_msg}")
-        return render_default(error_msg, form, url)
-
-    grades_query: sqlalchemy.orm.Query = Grades.query
-
-    grades_query = grades_query.filter_by(college=college)
-    if semester != 'all':
-        grades_query = grades_query.filter_by(semester=semester)
-    if year != 'all':
-        grades_query = grades_query.filter_by(year=year)
-
-    grades = grades_query.all()
-
-    if not grades:  # no records exist
-        try:
-            pdf_data = PdfParserDB(college, int(year), semester)
-            grades = pdf_data.get_grades_obj()
-        except requests.exceptions.HTTPError:
-            return render_default("There are no records for this semester.", form, url)
-
-        db.session.add_all(grades)
-        db.session.commit()
+    try:
+        grades = get_grades(college, year, semester)
+    except ValueError as e:
+        return render_default(str(e), form, url)
 
     return render_template("home.html", grade_results=grades, form=form, url=url)
 
@@ -163,16 +165,7 @@ def api_grades():
     semester = request.args.get('semester', 'all').lower()
     year = request.args.get('year', 'all').lower()
 
-    grades_query: sqlalchemy.orm.Query = Grades.query
-
-    if college != 'all':
-        grades_query = grades_query.filter_by(college=college)
-    if semester != 'all':
-        grades_query = grades_query.filter_by(semester=semester)
-    if year != 'all':
-        grades_query = grades_query.filter_by(year=year)
-
-    grades = grades_query.all()
+    grades = get_grades(college, year, semester)
 
     pdf_data = PdfParserDB(college, int(year), semester)
     grades_dict = pdf_data.get_dictionary(grades)
