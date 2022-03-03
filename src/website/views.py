@@ -115,6 +115,8 @@ def handle_invalid_college_params(college, semester, year) -> str:
 
 
 def get_grades(college, year, semester):
+    """ Retrieves list of grades from database if records exist or from PDF.
+    Raises ValueError for invalid parameters """
     error_msg = handle_invalid_college_params(college, semester, year)
 
     if error_msg:
@@ -130,7 +132,7 @@ def get_grades(college, year, semester):
         try:
             pdf_data = PdfParserDB(college, int(year), semester)
             grades = pdf_data.get_grades_obj()
-        except requests.exceptions.HTTPError:
+        except (ValueError, requests.exceptions.HTTPError):
             raise ValueError("There are no records for this semester.")
 
         db.session.add_all(grades)
@@ -161,11 +163,14 @@ def colleges_result():
 
 @views.route('/api/v1/resources/grades', methods=['GET'])
 def api_grades():
-    college = request.args.get('college', 'all').lower()
-    semester = request.args.get('semester', 'all').lower()
-    year = request.args.get('year', 'all').lower()
+    college = request.args.get('college').lower()
+    semester = request.args.get('semester').lower()
+    year = request.args.get('year').lower()
 
-    grades = get_grades(college, year, semester)
+    try:
+        grades = get_grades(college, year, semester)
+    except ValueError as e:
+        return str(e)
 
     pdf_data = PdfParserDB(college, int(year), semester)
     grades_dict = pdf_data.get_dictionary(grades)
