@@ -109,18 +109,18 @@
             <tr>
                 <td>{{ grade.department }}</td>
                 <td>{{ grade.course }} - {{ grade.section }}</td>
-                <td>{{ grade.amount_A }} <div class="text-muted">({{ "%.2f"|format(grade.percent_A) }}%)</div>
+                <td>{{ grade.amount_a }} <div class="text-muted">({{ "%.2f"|format(grade.percent_a) }}%)</div>
                 </td>
-                <td>{{ grade.amount_B }} <div class="text-muted">({{ "%.2f"|format(grade.percent_B) }})%</div>
+                <td>{{ grade.amount_b }} <div class="text-muted">({{ "%.2f"|format(grade.percent_b) }})%</div>
                 </td>
-                <td>{{ grade.amount_C }} <div class="text-muted">({{ "%.2f"|format(grade.percent_C) }})%</div>
+                <td>{{ grade.amount_c }} <div class="text-muted">({{ "%.2f"|format(grade.percent_c) }})%</div>
                 </td>
-                <td>{{ grade.amount_D }} <div class="text-muted">({{ "%.2f"|format(grade.percent_D) }})%</div>
+                <td>{{ grade.amount_d }} <div class="text-muted">({{ "%.2f"|format(grade.percent_d) }})%</div>
                 </td>
-                <td>{{ grade.amount_F }} <div class="text-muted">({{ "%.2f"|format(grade.percent_F) }})%</div>
+                <td>{{ grade.amount_f }} <div class="text-muted">({{ "%.2f"|format(grade.percent_f) }})%</div>
                 </td>
                 <td>{{ "%.3f"|format(grade.gpa) }}</td>
-                <td><a href="{{ url_for('views.professor', professor=grade.instructor) }}">{{ grade.instructor }}</a></td>
+                <td><a href="{{ url_for('views.professor', professor=grade.professor) }}">{{ grade.professor }}</a></td>
             </tr>
             {% endfor %}
         </tbody>

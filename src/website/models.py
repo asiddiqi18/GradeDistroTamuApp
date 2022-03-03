@@ -1,9 +1,6 @@
 from . import db
 
 
-# https://www.tutorialspoint.com/sqlalchemy/sqlalchemy_core_creating_table.htm
-
-
 class Grades(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     college = db.Column(db.String(50))
@@ -12,64 +9,107 @@ class Grades(db.Model):
     department = db.Column(db.String(4))
     course = db.Column(db.String(4))
     section = db.Column(db.SmallInteger)
-    amount_A = db.Column(db.SmallInteger, default=0)
-    percent_A = db.Column(db.Numeric(precision=2))
-    amount_B = db.Column(db.SmallInteger, default=0)
-    percent_B = db.Column(db.Numeric(precision=2))
-    amount_C = db.Column(db.SmallInteger, default=0)
-    percent_C = db.Column(db.Numeric(precision=2))
-    amount_D = db.Column(db.SmallInteger, default=0)
-    percent_D = db.Column(db.Numeric(precision=2))
-    amount_F = db.Column(db.SmallInteger, default=0)
-    percent_F = db.Column(db.Numeric(precision=2))
-    total_A_F = db.Column(db.SmallInteger)
+    amount_a = db.Column(db.SmallInteger, default=0)
+    percent_a = db.Column(db.Numeric(precision=2))
+    amount_b = db.Column(db.SmallInteger, default=0)
+    percent_b = db.Column(db.Numeric(precision=2))
+    amount_c = db.Column(db.SmallInteger, default=0)
+    percent_c = db.Column(db.Numeric(precision=2))
+    amount_d = db.Column(db.SmallInteger, default=0)
+    percent_d = db.Column(db.Numeric(precision=2))
+    amount_f = db.Column(db.SmallInteger, default=0)
+    percent_f = db.Column(db.Numeric(precision=2))
+    total = db.Column(db.SmallInteger)
     gpa = db.Column(db.Numeric)
-    other_I = db.Column(db.SmallInteger)
-    other_S = db.Column(db.SmallInteger)
-    other_U = db.Column(db.SmallInteger)
-    other_Q = db.Column(db.SmallInteger)
-    other_X = db.Column(db.SmallInteger)
+    other_i = db.Column(db.SmallInteger)
+    other_s = db.Column(db.SmallInteger)
+    other_u = db.Column(db.SmallInteger)
+    other_q = db.Column(db.SmallInteger)
+    other_x = db.Column(db.SmallInteger)
     other_total = db.Column(db.SmallInteger)
-    instructor = db.Column(db.String(50))
-    professor_id = db.Column(db.Integer, db.ForeignKey('professor.id'))
+    professor = db.Column(db.String(50))
+    instructor_id = db.Column(db.Integer, db.ForeignKey('instructor.id'))
 
     def __init__(self):
-        self.amount_A = 0
-        self.amount_B = 0
-        self.amount_C = 0
-        self.amount_D = 0
-        self.amount_F = 0
-        self.total_A_F = 0
-        self.other_Q = 0
+        self.amount_a = 0
+        self.amount_b = 0
+        self.amount_c = 0
+        self.amount_d = 0
+        self.amount_f = 0
+        self.total = 0
+        self.other_q = 0
 
     def merge(self, other):
-        self.amount_A += other.amount_A
-        self.amount_B += other.amount_B
-        self.amount_C += other.amount_C
-        self.amount_D += other.amount_D
-        self.amount_F += other.amount_F
-        self.other_Q += other.other_Q
-        self.total_A_F += other.total_A_F
+        self.amount_a += other.amount_a
+        self.amount_b += other.amount_b
+        self.amount_c += other.amount_c
+        self.amount_d += other.amount_d
+        self.amount_f += other.amount_f
+        self.other_q += other.other_q
+        self.total += other.total
 
     def retrieve_percents(self):
-        total = self.total_A_F
-        self.percent_A = self.amount_A / total
-        self.percent_B = self.amount_B / total
-        self.percent_C = self.amount_C / total
-        self.percent_D = self.amount_D / total
-        self.percent_F = self.amount_F / total
+        total = self.total
+        self.percent_a = self.amount_a / total
+        self.percent_b = self.amount_b / total
+        self.percent_c = self.amount_c / total
+        self.percent_d = self.amount_d / total
+        self.percent_f = self.amount_f / total
+
+    @property
+    def serialize(self):
+        """Return object data in easily serializable format"""
+        serialize_dict = {
+            'id': self.id,
+            'college': self.college,
+            'year': self.year,
+            'semester': self.semester,
+            'department': self.department,
+            'course': self.course,
+            'section': self.section,
+            'amount_a': self.amount_a,
+            'percent_a': self.percent_a,
+            'amount_b': self.amount_b,
+            'percent_b': self.percent_b,
+            'amount_c': self.amount_c,
+            'percent_c': self.percent_c,
+            'amount_d': self.amount_d,
+            'percent_d': self.percent_d,
+            'amount_f': self.amount_f,
+            'percent_f': self.percent_f,
+            'total': self.total,
+            'gpa': self.gpa,
+            'other_i': self.other_i,
+            'other_s': self.other_s,
+            'other_u': self.other_u,
+            'other_q': self.other_q,
+            'other_x': self.other_x,
+            'other_total': self.other_total,
+            'professor': self.professor,
+            'instructor_id': self.instructor_id
+        }
+
+        return {u: str(v) for u, v in serialize_dict.items()}
+
+    @property
+    def serialize_many2many(self):
+        """
+       Return object's relations in easily serializable format.
+       NB! Calls many2many's serialize property.
+       """
+        return [item.serialize for item in self.many2many]
 
     def __repr__(self):
         return f'''<Grades: [
             College: {self.college} Year: {self.year},  Semester: {self.semester},  Department: {self.department}, 
-            Course: {self.course},  GPA: {self.gpa}, Instructor: {self.instructor}]>'''
+            Course: {self.course},  GPA: {self.gpa}, Professor: {self.professor}]>'''
 
 
-class Professor(db.Model):
+class Instructor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     short_name = db.Column(db.String(50))
     full_name = db.Column(db.String(50))
-    classes = db.relationship('Grades', backref='professor')
+    classes = db.relationship('Grades', backref='instructor')
 
     def __repr__(self):
         return f'''<Professor: [
