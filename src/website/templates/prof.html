@@ -6,235 +6,243 @@
 
 {% block content %}
 
-<h1 class="mt-5 text-center">Texas A&M Grade Distribution</h1>
-<br />
-<div class="text-center border border-light p-5 mb-5">
+    <h1 class="mt-5 text-center">Texas A&M Grade Distribution</h1>
+    <br/>
+    <div class="text-center border border-light p-5 mb-5">
 
-    <ul class="nav nav-pills nav-fill mb-4 " id="pills-tab" role="tablist">
+        <ul class="nav nav-pills nav-fill mb-4 " id="pills-tab" role="tablist">
 
-        <li class="nav-item">
-            <a class="nav-link " id="pills-home-tab" data-toggle="pill"
-                href="#pills-home" role="tab" aria-controls="pills-home"
-                aria-selected="false">Sort by College <i
-                    class="fas fa-university"></i></a>
-        </li>
+            <li class="nav-item">
+                <a class="nav-link " id="pills-home-tab" data-toggle="pill"
+                   href="#pills-home" role="tab" aria-controls="pills-home"
+                   aria-selected="false">Sort by College <i
+                        class="fas fa-university"></i></a>
+            </li>
 
-        <li class="nav-item">
-            <a class="nav-link active" id="pills-profile-tab"
-                data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile"
-                aria-selected="true">Sort by Professor <i
-                    class="fas fa-user-tie"></i></a>
-        </li>
+            <li class="nav-item">
+                <a class="nav-link active" id="pills-profile-tab"
+                   data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile"
+                   aria-selected="true">Sort by Professor <i
+                        class="fas fa-user-tie"></i></a>
+            </li>
 
-    </ul>
+        </ul>
 
-    <div class="tab-content pt-2 pl-1" id="pills-tabContent">
+        <div class="tab-content pt-2 pl-1" id="pills-tabContent">
 
-        <div class="tab-pane fade" id="pills-home" role="tabpanel"
-            aria-labelledby="pills-home-tab">
-            <p class="h4 mb-4">Sort by college, year and semester</p>
+            <div class="tab-pane fade" id="pills-home" role="tabpanel"
+                 aria-labelledby="pills-home-tab">
+                <p class="h4 mb-4">Sort by college, year and semester</p>
 
-            <p class="mb-5">Know which professors or courses to take and avoid!</p>
-
-            <!-- College -->
-            <form class="mt-5" method="GET" action="results" id="form_results">
+                <p class="mb-5">Know which professors or courses to take and avoid!</p>
 
                 <!-- College -->
-                <div class="form-group mx-3">{{ render_field(form.college, placeholder=form.college.label.text) }}</div>
+                <form class="mt-5" method="GET" action="results" id="form_results">
+
+                    <!-- College -->
+                    <div class="form-group mx-3">{{ render_field(form.college, placeholder=form.college.label.text) }}</div>
 
 
+                    <div class="form-row">
+                        <!-- Semester -->
+                        <div class="form-group col-md mx-3 mt-3 mb-1">
+                            {{ render_field(form.semester, placeholder=form.semester.label.text) }}
+                        </div>
 
-                <div class="form-row">
-                    <!-- Semester -->
-                    <div class="form-group col-md mx-3 mt-3 mb-1">
-                        {{ render_field(form.semester, placeholder=form.semester.label.text) }}
+                        <!-- Year -->
+                        <div class="form-group col-md mx-3 mt-3 mb-1">
+                            {{ render_field(form.year, placeholder=form.year.label.text) }}
+                        </div>
                     </div>
 
-                    <!-- Year -->
-                    <div class="form-group col-md mx-3 mt-3 mb-1">
-                        {{ render_field(form.year, placeholder=form.year.label.text) }}
+                    <!-- Send button -->
+                    <div class="form-group mb-1">
+                        <button class="btn btn-info mt-4 px-auto" type="submit">Search</button>
                     </div>
-                </div>
 
-                <!-- Send button -->
-                <div class="form-group mb-1">
-                    <button class="btn btn-info mt-4 px-auto" type="submit">Search</button>
-                </div>
+                </form>
+            </div>
 
-            </form>
-        </div>
+            <div class="tab-pane fade show active " id="pills-profile"
+                 role="tabpanel" aria-labelledby="pills-profile-tab">
+                <p class="h4 mb-4">Sort by professors</p>
 
-        <div class="tab-pane fade show active " id="pills-profile"
-            role="tabpanel" aria-labelledby="pills-profile-tab">
-            <p class="h4 mb-4">Sort by professors</p>
+                <p class="mb-5">Know which professors to take and avoid!</p>
 
-            <p class="mb-5">Know which professors to take and avoid!</p>
+                <!-- Professor -->
+                <form method="GET" class="needs-validation" action="professors" novalidate>
 
-            <!-- Professor -->
-            <form method="GET" class="needs-validation" action="professors" novalidate>
-
-                <div class="row">
-                    <div class="col-md-6 offset-md-3">
-                        <div class="form-group mx-3">{{ render_string_field(form.professor,
+                    <div class="row">
+                        <div class="col-md-6 offset-md-3">
+                            <div class="form-group mx-3">{{ render_string_field(form.professor,
                             placeholder=form.professor.label.text) }}</div>
-                        <div class="invalid-feedback">This field is required.</div>
+                            <div class="invalid-feedback">This field is required.</div>
+                        </div>
                     </div>
+
+                    <!-- Send button -->
+                    <div class="form-group mb-1">
+                        <button class="btn btn-info mt-4 px-auto" type="submit">Search</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% if grade_results == None %}
+        <!-- <p>use the above form to get data</p> -->
+    {% else %}
+
+        {% if grade_results|length == 0 %}
+            <h1 class="text-center">No results.</h1>
+        {% else %}
+
+            <hr>
+
+            <h1>Stats for {{ averages.professor }}</h1>
+
+            <h4 class="mt-3"> This professor's average GPA is <strong
+                    class="indigo-text">{{ "%.3f"|format(averages.gpa) }}</strong> over a span of <strong
+                    class="indigo-text">{{ grade_results|length }}</strong> sections taught from <strong
+                    class="indigo-text">{{ trend_year[0] }}</strong> to <strong
+                    class="indigo-text">{{ trend_year[-1] }}</strong>.</h4>
+
+            <p class="mt-3 mb-5">Has previously taught: {{ courses }}</p>
+
+            <div class="card mb-5">
+                <div class="card-header text-white unique-color">
+                    <i class="far fa-chart-bar"></i> Charts
                 </div>
+                <div class="card-body p-5">
+                    {# <h5 class="card-title">Special title treatment</h5> #}
+                    <div>
+                        <canvas id="gradeDistChart"></canvas>
+                    </div>
 
-                <!-- Send button -->
-                <div class="form-group mb-1">
-                    <button class="btn btn-info mt-4 px-auto" type="submit">Search</button>
+
+                    <script>
+                        // Bar chart
+                        new Chart(document.getElementById("gradeDistChart"), {
+                            type: 'bar',
+                            data: {
+                                labels: ['A', 'B', 'C', 'D', 'F', 'Q-drop'],
+                                datasets: [
+                                    {
+                                        label: "Total Grade Distribution for {{ averages.professor }} (number of students)",
+                                        backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850", "#8a1806"],
+                                        data: [{{ averages.amount_a }}, {{ averages.amount_b }}, {{ averages.amount_c }}, {{ averages.amount_d }}, {{ averages.amount_f }}, {{ averages.other_q }}]
+                                    }
+                                ]
+                            },
+                            options: {
+                                legend: {display: false},
+                                title: {
+                                    display: true,
+                                    text: 'Grade distribution bar chart'
+                                }
+                            }
+                        });
+                    </script>
+
+                    <div>
+                        <canvas id="trendLine"></canvas>
+                    </div>
+
+                    <script>
+                        // Bar chart
+                        new Chart(document.getElementById("trendLine"), {
+                            type: 'line',
+                            data: {
+                                labels: {{ trend_year }},
+                                datasets: [
+                                    {
+                                        label: "Average GPA Across the Years",
+                                        borderColor: 'rgb(75, 192, 192)',
+                                        data: {{ trend_gpa }}
+                                    },
+                                ]
+                            },
+                            options: {
+                                legend: {display: false},
+                                title: {
+                                    display: true,
+                                    text: 'Grade distribution bar chart'
+                                },
+                                scales: {
+                                    y: {
+                                        min: 0,
+                                        max: 4,
+                                    }
+                                }
+                            }
+                        });
+                    </script>
+
                 </div>
-
-        </div>
-    </div>
-</div>
-
-{% if grade_results == None %}
-<!-- <p>use the above form to get data</p> -->
-{% else %}
-
-{% if grade_results|length == 0 %}
-<h1 class="text-center">No results.</h1>
-{% else %}
-
-   <hr>
-
-<h1>Stats for {{averages.professor}}</h1>
-
-<h4 class="mt-3"> This professor's average GPA is <strong class="indigo-text">{{ "%.3f"|format(averages.gpa) }}</strong> over a span of <strong class="indigo-text">{{ grade_results|length }}</strong> sections taught from <strong class="indigo-text">{{ trend_year[0] }}</strong> to <strong class="indigo-text">{{ trend_year[-1] }}</strong>.</h4>
-
-<p class="mt-3 mb-5">Has previously taught: {{ courses }}</p>
-
-<div class="card mb-5">
-    <div class="card-header text-white unique-color">
-        <i class="far fa-chart-bar"></i> Charts
-    </div>
-    <div class="card-body p-5">
-        {# <h5 class="card-title">Special title treatment</h5> #}
-        <div>
-            <canvas id="gradeDistChart"></canvas>
-        </div>
+            </div>
 
 
-        <script>
-            // Bar chart
-            new Chart(document.getElementById("gradeDistChart"), {
-                type: 'bar',
-                data: {
-                    labels: ['A', 'B', 'C', 'D', 'F', 'Q-drop'],
-                    datasets: [
-                        {
-                            label: "Total Grade Distribution for {{ averages.professor }} (number of students)",
-                            backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850", "#8a1806"],
-                            data: [{{ averages.amount_a }}, {{ averages.amount_b }}, {{ averages.amount_c }}, {{ averages.amount_d }}, {{ averages.amount_f }}, {{ averages.other_q }} ]
-                }
-                ]
-            },
-                options: {
-                legend: { display: false },
-                title: {
-                    display: true,
-                    text: 'Grade distribution bar chart'
-                }
-            }
-        });
-        </script> 
-
-        <div>
-            <canvas id="trendLine"></canvas>
-        </div>
-
-        <script>
-            // Bar chart
-            new Chart(document.getElementById("trendLine"), {
-                type: 'line',
-                data: {
-                    labels: {{ trend_year }},
-                    datasets: [
-                        {
-                            label: "Average GPA Across the Years",
-                            borderColor: 'rgb(75, 192, 192)',
-                            data: {{ trend_gpa }}
-                         },
-                    ]
-                },
-                options: {
-                    legend: { display: false },
-                    title: {
-                        display: true,
-                        text: 'Grade distribution bar chart'
-                    },
-                    scales : {
-                        y : {
-                            min: 0,
-                            max: 4,
-                        }
-                    }
-                }
-        });
-        </script>
-
-    </div>
-</div>
-
-
-<table id="dtBasicExample" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
-    <thead>
-        <tr>
-            <th class="th-sm">Department</th>
-            <th class="th-sm">Course / Section</th>
-            <th class="th-sm">Year</th>
-            <th class="th-sm">A</th>
-            <th class="th-sm">B</th>
-            <th class="th-sm">C</th>
-            <th class="th-sm">D</th>
-            <th class="th-sm">F</th>
-            <th class="th-sm">GPA</th>
-            <th class="th-sm">Instructor</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for grade in grade_results %}
-        <tr>
-            <td>{{ grade.department }}</td>
-            <td>{{ grade.course }} - {{ grade.section }}</td>
-            <td>{{ grade.year }}</td>
-            <td>{{ grade.amount_a }} <div class="text-muted">({{ "%.2f"|format(grade.percent_a) }}%)</div>
-            </td>
-            <td>{{ grade.amount_b }} <div class="text-muted">({{ "%.2f"|format(grade.percent_b) }})%</div>
-            </td>
-            <td>{{ grade.amount_c }} <div class="text-muted">({{ "%.2f"|format(grade.percent_c) }})%</div>
-            </td>
-            <td>{{ grade.amount_d }} <div class="text-muted">({{ "%.2f"|format(grade.percent_d) }})%</div>
-            </td>
-            <td>{{ grade.amount_f }} <div class="text-muted">({{ "%.2f"|format(grade.percent_f) }})%</div>
-            </td>
-            <td>{{ "%.3f"|format(grade.gpa) }}</td>
-            <td>{{ grade.professor }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-    <tfoot>
-        <tr>
-            <th>Department</th>
-            <th>Course</th>
-            <th>Year</th>
-            <th>Section</th>
-            <th>A</th>
-            <th>B</th>
-            <th>C</th>
-            <th>D</th>
-            <th>F</th>
-        </tr>
-    </tfoot>
-</table>
-{% endif %}
+            <table id="dtBasicExample" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+                <thead>
+                <tr>
+                    <th class="th-sm">Department</th>
+                    <th class="th-sm">Course / Section</th>
+                    <th class="th-sm">Year</th>
+                    <th class="th-sm">A</th>
+                    <th class="th-sm">B</th>
+                    <th class="th-sm">C</th>
+                    <th class="th-sm">D</th>
+                    <th class="th-sm">F</th>
+                    <th class="th-sm">GPA</th>
+                    <th class="th-sm">Instructor</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for grade in grade_results %}
+                    <tr>
+                        <td>{{ grade.department }}</td>
+                        <td>{{ grade.course }} - {{ grade.section }}</td>
+                        <td>{{ grade.year }}</td>
+                        <td>{{ grade.amount_a }}
+                            <div class="text-muted">({{ "%.2f"|format(grade.percent_a) }}%)</div>
+                        </td>
+                        <td>{{ grade.amount_b }}
+                            <div class="text-muted">({{ "%.2f"|format(grade.percent_b) }})%</div>
+                        </td>
+                        <td>{{ grade.amount_c }}
+                            <div class="text-muted">({{ "%.2f"|format(grade.percent_c) }})%</div>
+                        </td>
+                        <td>{{ grade.amount_d }}
+                            <div class="text-muted">({{ "%.2f"|format(grade.percent_d) }})%</div>
+                        </td>
+                        <td>{{ grade.amount_f }}
+                            <div class="text-muted">({{ "%.2f"|format(grade.percent_f) }})%</div>
+                        </td>
+                        <td>{{ "%.3f"|format(grade.gpa) }}</td>
+                        <td>{{ grade.professor }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th>Department</th>
+                    <th>Course</th>
+                    <th>Year</th>
+                    <th>Section</th>
+                    <th>A</th>
+                    <th>B</th>
+                    <th>C</th>
+                    <th>D</th>
+                    <th>F</th>
+                </tr>
+                </tfoot>
+            </table>
+        {% endif %}
 
 
 
-{% endif %}
-<br />
+    {% endif %}
+    <br/>
 
 
 {% endblock %}

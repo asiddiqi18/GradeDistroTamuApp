@@ -1,7 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import SelectField
 from datetime import date
-import pathlib
 
 from wtforms.fields.core import StringField
 from wtforms.validators import InputRequired
