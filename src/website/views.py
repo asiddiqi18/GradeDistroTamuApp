@@ -1,9 +1,9 @@
 import sqlalchemy.orm
-from flask import Blueprint, render_template, request, flash
+from flask import Blueprint, render_template, request, flash, jsonify
 import requests
 from datetime import date
 from ..parser_api.pdf_parser_model import PdfParserDB
-from .models import Grades, Professor
+from .models import Grades, Instructor
 from . import db
 from .forms import CourseForm
 from ..parser_api.college_lookup import get_colleges
@@ -52,8 +52,8 @@ def professor():
     if error_msg:
         return render_default(error_msg, form, url)
 
-    professors = Professor.query.filter(
-        Professor.short_name.like(professor_request + "%")).first()
+    professors = Instructor.query.filter(
+        Instructor.short_name.like(professor_request + "%")).first()
     if professors is None:
         return render_default('No results were found for this professor.', form, url)
 
@@ -85,7 +85,7 @@ def professor():
 
     averages.retrieve_percents()
     averages.gpa = sum_gpa / len(grades)
-    averages.instructor = grades[0].instructor
+    averages.professor = grades[0].professor
 
     years = list(gpa_trend.keys())
     gpa_list = list(gpa_trend.values())
@@ -136,8 +136,7 @@ def colleges_result():
 
     grades_query: sqlalchemy.orm.Query = Grades.query
 
-    if college != 'all':
-        grades_query = grades_query.filter_by(college=college)
+    grades_query = grades_query.filter_by(college=college)
     if semester != 'all':
         grades_query = grades_query.filter_by(semester=semester)
     if year != 'all':
@@ -158,7 +157,29 @@ def colleges_result():
     return render_template("home.html", grade_results=grades, form=form, url=url)
 
 
+@views.route('/api/v1/resources/grades', methods=['GET'])
+def api_grades():
+    college = request.args.get('college', 'all').lower()
+    semester = request.args.get('semester', 'all').lower()
+    year = request.args.get('year', 'all').lower()
+
+    grades_query: sqlalchemy.orm.Query = Grades.query
+
+    if college != 'all':
+        grades_query = grades_query.filter_by(college=college)
+    if semester != 'all':
+        grades_query = grades_query.filter_by(semester=semester)
+    if year != 'all':
+        grades_query = grades_query.filter_by(year=year)
+
+    grades = grades_query.all()
+
+    pdf_data = PdfParserDB(college, int(year), semester)
+    grades_dict = pdf_data.get_dictionary(grades)
+    return grades_dict
+
+
 @views.errorhandler(404)
-def page_not_found():
+def page_not_found(e):
     # note that we set the 404 status explicitly
-    return render_template("not_found.html"), 404
+    return render_template("not_found.html")

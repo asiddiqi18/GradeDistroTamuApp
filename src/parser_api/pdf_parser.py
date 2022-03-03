@@ -22,14 +22,22 @@ class PdfParser:
     # Regex to extract info from PDF binaries.
     # regex_main is used for most retrievals
     regex_main = re.compile(
-        r'(\D{4})-(\d{3,4})-(\d{3})\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+('
-        r'\d+.\d+)%\s+(\d+)\s+(\d+.\d+)%\s+(\d+)\s+(\d+.\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+('
+        r'(?P<department>\D{4})-(?P<course>\d{3,4})-(?P<section>\d{3})\s+(?P<amount_a>\d+)\s+('
+        r'?P<percent_a>\d+.\d+)%\s+(?P<amount_b>\d+)\s+(?P<percent_b>\d+.\d+)%\s+('
+        r'?P<amount_c>\d+)\s+(?P<percent_c>\d+.\d+)%\s+(?P<amount_d>\d+)\s+('
+        r'?P<percent_d>\d+.\d+)%\s+(?P<amount_f>\d+)\s+(?P<percent_f>\d+.\d+)%\s+('
+        r'?P<total>\d+)\s+(?P<gpa>\d+.\d+)\s+(?P<other_i>\d+)\s+(?P<other_s>\d+)\s+(?P<other_u>\d+)\s+('
+        r'?P<other_q>\d+)\s+(?P<other_x>\d+)\s+(?P<other_total>\d+)\s+(?P<professor>'
         r'\S+\s\w)')
 
     # However, most PDFs from 2016 are formatted slightly different, requiring an alternative pattern
     regex_alt = re.compile(
-        r'(\D{4})-(\d{3,4})-(\d{3})\s+(\d+.\d+)\s+(\S+\s\w)\s(\d+.\d+)%\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+('
-        r'\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+.\d+)%\s+(\d+.\d+)%\s+(\d+.\d+)%\s+(\d+.\d+)%')
+        r'(?P<department>\D{4})-(?P<course>\d{3,4})-(?P<section>\d{3})\s+(?P<gpa>\d+.\d+)\s+(?P<professor>\S+\s\w)\s('
+        r'?P<percent_a>\d+.\d+)%\s+(?P<amount_a>\d+)\s+(?P<amount_b>\d+)\s+('
+        r'?P<amount_c>\d+)\s+(?P<amount_d>\d+)\s+(?P<amount_f>\d+)\s+(?P<total>\d+)\s+('
+        r'?P<other_i>\d+)\s+(?P<other_s>\d+)\s+(?P<other_u>\d+)\s+(?P<other_q>\d+)\s+(?P<other_x>\d+)\s+('
+        r'?P<other_total>\d+)\s+(?P<percent_b>\d+.\d+)%\s+(?P<percent_c>\d+.\d+)%\s+('
+        r'?P<percent_d>\d+.\d+)%\s+(?P<percent_f>\d+.\d+)%')
 
     def __init__(self, college: str, year: int, semester: str, store_pdfs=False):
         self.college = college
@@ -61,6 +69,13 @@ class PdfParser:
             filename = filename.replace(danger, "_")
         return filename
 
+    def get_pdf_path(self):
+        # Get/create directory for PDFs, and get path of the pdf that will be downloaded/is saved
+        file_name = self.file_name() + ".pdf"
+        pdf_dir = parent_dir / pathlib.Path("pdf")
+        pdf_dir.mkdir(parents=True, exist_ok=True)
+        return pdf_dir / pathlib.Path(file_name)
+
     def semester_to_numeric_code(self):
         """ Get the numerical coding used for the URL from the semester """
         return self.semesters[self.semester]
@@ -76,14 +91,11 @@ class PdfParser:
             Returns path of downloaded PDF / existing PDF
         """
 
-        # Get/create directory for PDFs, and get path of the pdf that will be downloaded/is saved
-        file_name = self.file_name() + ".pdf"
-        pdf_dir = parent_dir / pathlib.Path("pdf")
-        pdf_dir.mkdir(parents=True, exist_ok=True)
-        pdf_path = pdf_dir / pathlib.Path(file_name)
+        pdf_path = self.get_pdf_path()
 
         # If PDF not already downloaded, then request it from URL
         if not pdf_path.exists():
+            logging.info("PDF does not exist, downloading PDF...")
             # Generate a URL by converting parameters to values expected by URL
             abbreviation = self.get_college_abbreviation()
             year_semester = str(self.year) + str(self.semester_to_numeric_code())
@@ -98,37 +110,34 @@ class PdfParser:
             with open(pdf_path, 'wb') as f:
                 f.write(res.content)
 
-        # save the path of the PDF as a field
-        self.pdf_path = pdf_path
+            logging.info("PDF downloaded!")
 
-    def text_extractor(self):
+    def text_extractor(self) -> list:
         """
             Parses the grade distribution PDF for its information using regex pattern.
-            Returns a 2D list, structured in a tabular way.
-            What index corresponds to what value depends on the type of pattern used.
+            Returns a list of dictionaries, each dictionary containing info about a particular course section
         """
 
         # If this function is called without downloading the PDF first, then download the PDF
-        if self.pdf_path is None:
-            logging.info("No PDF file has been downloaded. Downloading now...")
-            self.download_pdf()
+        self.download_pdf()
 
         logging.info("Extracting PDF...")
 
         # Otherwise, use regex pattern to extract information
         # Regex patterns precompiled above.
-        results = []
-        with open(self.pdf_path, 'rb') as f:
+        with open(self.get_pdf_path(), 'rb') as f:
             pdf = PyPDF2.PdfFileReader(f)
             number_of_pages = pdf.getNumPages()
+
+            results = []
 
             for p in range(number_of_pages):
                 page = pdf.getPage(p)
                 text = page.extractText()
-                regex_result = self.regex_main.findall(text)
+                regex_result = [m.groupdict() for m in self.regex_main.finditer(text)]
                 # If this regex pattern did not yield anything, then try using the alternative regex pattern
                 if len(regex_result) == 0:
-                    regex_result = self.regex_alt.findall(text)
+                    regex_result = [m.groupdict() for m in self.regex_alt.finditer(text)]
                     if len(regex_result) != 0:
                         self.alt = True  # Designate that alternative pattern was used for future uses
 
@@ -142,73 +151,54 @@ class PdfParser:
         logging.info("Finished extracting!")
         return results
 
-    def get_dictionary(self):
+    def get_dictionary(self, lst_of_grades_dict=None):
         """ Serializes the PDF results to Python dictionary object """
-        list_of_courses = self.text_extractor()
-        if len(list_of_courses) == 0:
-            logging.warning("No courses were found.")
-            return None
+
+        if not lst_of_grades_dict:
+            lst_of_grades_dict: list = self.text_extractor()
+            if len(lst_of_grades_dict) == 0:
+                logging.warning("No courses were found.")
+                return None
 
         results_dict = {}
 
-        for result in list_of_courses:
+        for result in lst_of_grades_dict:
 
-            if len(result) != self.arg_expect_amount:
-                raise RuntimeError("Incorrect number of attributes in course info. Got %d, expected %d.", len(result),
-                                   self.arg_expect_amount)
+            department = result['department']
+            course = result['course']
+            section = result['section']
 
-            department = result[0]
-            course = result[1]
-            section = result[2]
-
-            grade_amount = {}
-            grade_percentage = {}
+            amount = {}
+            percentage = {}
             other = {}
 
-            if not self.alt:
-                grade_amount['A'] = result[3]
-                grade_amount['B'] = result[5]
-                grade_amount['C'] = result[7]
-                grade_amount['D'] = result[9]
-                grade_amount['F'] = result[11]
-                grade_percentage['A'] = result[4]
-                grade_percentage['B'] = result[6]
-                grade_percentage['C'] = result[8]
-                grade_percentage['D'] = result[10]
-                grade_percentage['F'] = result[12]
-                total = result[13]
-                gpa = result[14]
-                other['I'] = result[15]
-                other['S'] = result[16]
-                other['U'] = result[17]
-                other['Q'] = result[18]
-                other['X'] = result[19]
-                other['total'] = result[20]
-                professor = result[21]
-            else:
-                grade_amount['A'] = result[6]
-                grade_amount['B'] = result[7]
-                grade_amount['C'] = result[8]
-                grade_amount['D'] = result[9]
-                grade_amount['F'] = result[10]
-                grade_percentage['A'] = result[5]
-                grade_percentage['B'] = result[18]
-                grade_percentage['C'] = result[19]
-                grade_percentage['D'] = result[20]
-                grade_percentage['F'] = result[21]
-                total = result[11]
-                gpa = result[3]
-                other['I'] = result[12]
-                other['S'] = result[13]
-                other['U'] = result[14]
-                other['Q'] = result[15]
-                other['X'] = result[16]
-                other['total'] = result[17]
-                professor = result[4]
+            amount['A'] = result['amount_a']
+            amount['B'] = result['amount_b']
+            amount['C'] = result['amount_c']
+            amount['D'] = result['amount_d']
+            amount['F'] = result['amount_f']
+
+            percentage['A'] = result['percent_a']
+            percentage['B'] = result['percent_b']
+            percentage['C'] = result['percent_c']
+            percentage['D'] = result['percent_d']
+            percentage['F'] = result['percent_f']
+
+            total = result['total']
+            gpa = result['gpa']
+
+            other['I'] = result['other_i']
+            other['S'] = result['other_s']
+            other['U'] = result['other_u']
+            other['Q'] = result['other_q']
+            other['X'] = result['other_x']
+            other['total'] = result['other_total']
+
+            professor = result['professor']
 
             section_dict = {
-                "grade_amount": grade_amount,
-                "grade_percentage": grade_percentage,
+                "amount": amount,
+                "percentage": percentage,
                 "total": total,
                 "gpa": gpa,
                 "other": other,
@@ -235,33 +225,31 @@ class PdfParser:
                 shutil.rmtree(folder)
                 logging.info("Successfully deleted %s" % d)
 
+    def get_json(self):
+        return json.dumps(self.get_dictionary())
+
     def save_json(self):
         """
             Downloads and parses a PDF file from TAMU grade distributions, provides a JSON file with results
             Return value is pathlib object for the output JSON.
         """
 
-        if self.json is None:
-            self.get_json_obj()
+        logging.info("Converting content to JSON...")
+        # convert dictionary to json
+
+        results_dict = self.get_dictionary()
 
         json_dir = parent_dir / pathlib.Path("json")
         json_dir.mkdir(parents=True, exist_ok=True)
         json_file = json_dir / pathlib.Path(self.file_name() + ".json")
+
         with open(json_file, 'w') as file:
-            json.dump(self.json, file, indent=4)
+            json.dump(results_dict, file, indent=4)
 
         logging.info("Saved to JSON!")
         return json_file
 
-    def get_json_obj(self):
-        """ Get JSON object of data """
-
-        logging.info("Converting content to JSON...")
-        # convert dictionary to json
-        self.json = json.dumps(self.get_dictionary(), indent=4)
-        return self.json
-
 
 if __name__ == "__main__":
-    pdf_json = PdfParser("engineering", 2021, "spring")
+    pdf_json = PdfParser("engineering", 2016, "fall", store_pdfs=True)
     pdf_json.save_json()

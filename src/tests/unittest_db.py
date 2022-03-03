@@ -34,11 +34,15 @@ def single_test_db(college, year, semester):
     logger.info(test_info.center(80, '='))
     pdf_json = PdfParserDB(college, year, semester)
     try:
+        logging.info("Converting to Grades object...")
         grades = pdf_json.get_grades_obj()
+        logging.info("Converted successfully!")
         if not grades:
             raise NoCourses
+        logging.info("Adding to database...")
         db.session.add_all(grades)
         db.session.commit()
+        logging.info("Successfully added to database!")
 
     except requests.exceptions.HTTPError:
         errors.append(f"HTTP error: Could not locate PDF for this entry. ({test_info})")
