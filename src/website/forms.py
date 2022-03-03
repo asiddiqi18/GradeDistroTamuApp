@@ -11,11 +11,9 @@ from ..parser_api.college_lookup import get_colleges
 # creating the date object of today's date
 today_date = date.today()
 
-all = ('all', 'All')
-
 year_start = 2016
 year_end = int(today_date.year)
-years = [all]
+years = []
 for i in reversed(range(year_start, year_end + 1)):
     years.append((i, i))
 
@@ -29,7 +27,7 @@ for college in abbreviations.keys():
 
 class CourseForm(FlaskForm):
     college = SelectField('College', choices=colleges, default='academic success center')
-    semester = SelectField('Semester', choices=[all, (
+    semester = SelectField('Semester', choices=[(
         'spring', 'Spring'), ('summer', 'Summer'), ('fall', 'Fall')], default='spring')
     year = SelectField('Year', choices=years, default=str(year_end))
     professor = StringField('Professor', validators=[InputRequired("This field is required.")])
