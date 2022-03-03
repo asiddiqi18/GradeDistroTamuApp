@@ -53,13 +53,14 @@ class PdfParser:
         # Validate parameters
         abbreviation_dict = get_colleges()
         if self.college.lower() not in abbreviation_dict:
-            raise ValueError("College '%s' not identified. Enter one of these following colleges: %s" % (
-                self.college, ", ".join(list(abbreviation_dict.keys()))))
+            raise ValueError(
+                f"College '{self.college}' not identified. Enter one of these following colleges: \
+                {', '.join(list(abbreviation_dict.keys()))}")
         if int(self.year) < 2016:
             raise ValueError("Data for years before 2016 do not exist!")
         if self.semester not in self.semesters:
             raise ValueError(
-                "Semester '%s' not identified".join(self.semesters))
+                f"Semester '{self.semester}' not identified")
 
     def file_name(self):
         """ Generate a safe file name for the PDF from the parameters """
@@ -163,7 +164,6 @@ class PdfParser:
         results_dict = {}
 
         for result in lst_of_grades_dict:
-
             department = result['department']
             course = result['course']
             section = result['section']
@@ -205,12 +205,16 @@ class PdfParser:
                 "professor": professor
             }
 
-            if department not in results_dict:
-                results_dict[department] = {}
-            if course not in results_dict[department]:
-                results_dict[department][course] = {}
+            college = result.get('college', self.college)
+            year = result.get('year', self.year)
+            semester = result.get('semester', self.semester)
 
-            results_dict[department][course][section] = section_dict
+            results_dict.setdefault(college, {})
+            results_dict[college].setdefault(year, {})
+            results_dict[college][year].setdefault(semester, {})
+            results_dict[college][year][semester].setdefault(department, {})
+            results_dict[college][year][semester][department].setdefault(course, {})
+            results_dict[college][year][semester][department][course][section] = section_dict
 
         return results_dict
 
