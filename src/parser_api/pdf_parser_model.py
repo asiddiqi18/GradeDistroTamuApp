@@ -21,10 +21,6 @@ class PdfParserDB(PdfParser):
 
         for result in list_of_courses:
 
-            if len(result) != self.arg_expect_amount:
-                raise RuntimeError("Incorrect number of attributes in course info. Got %d, expected %d.", len(result),
-                                   self.arg_expect_amount)
-
             grade = Grades()
 
             grade.college = self.college
@@ -75,6 +71,16 @@ class PdfParserDB(PdfParser):
         lst_of_grades_dict = []
         for g in lst_of_grades:
             lst_of_grades_dict.append(
-                {k: str(v) for k, v in g.__dict__.items() if not (k.startswith('__') and k.endswith('__'))})
+                {k: str(v) for k, v in g.__dict__.items() if not (k.startswith('__') and k.endswith('__'))}
+            )
+            dct = {
+                'college': self.college,
+                'year': self.year,
+                'semester': self.semester
+            }
+            for k, v in g.__dict__.items():
+                if not (k.startswith('__') and k.endswith('__')):
+                    dct[k] = str(v)
+            lst_of_grades_dict.append(dct)
 
         return super(PdfParserDB, self).get_dictionary(lst_of_grades_dict)
