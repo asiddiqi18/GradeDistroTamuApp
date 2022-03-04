@@ -91,7 +91,7 @@
                         </td>
                         <td>{{ "%.3f"|format(grade.gpa) }}</td>
                         <td>
-                            <a href="{{ url_for('views.professors', professor=grade.professor) }}">{{ grade.professor }}</a>
+                            <a href="{{ url_for('professors.professors', professor=grade.professor) }}">{{ grade.professor }}</a>
                         </td>
                     </tr>
                 {% endfor %}

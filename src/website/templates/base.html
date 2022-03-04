@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="static/image.png"/>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='image.png') }}"/>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
     <!-- Google Fonts -->
@@ -16,13 +16,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='MDB-Free_4.19.2/css/mdb.min.css') }}">
     <!-- MDBootstrap Datatables  -->
     <link rel="stylesheet" href="{{ url_for('static', filename='MDB-Free_4.19.2/css/addons/datatables.min.css') }}">
-    <!-- Semantics UI CSS -->
-    <!-- <link href="static/Semantic-UI-CSS-master/semantic.min.css" rel="stylesheet"> -->
+
     <!-- Local CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 
     <title>{% block title %}Home{% endblock %}</title>
 </head>
@@ -33,7 +31,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark unique-color mb-4">
 
         <!-- Navbar brand -->
-        <a class="navbar-brand ml-3" href="/">TAMU Grade Distrubition Database</a>
+        <a class="navbar-brand ml-3" href="/">TAMU Grade Distribution Database</a>
 
         <!-- Collapse button -->
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#basicExampleNav"
@@ -49,21 +47,22 @@
             <!-- Links -->
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item {% if active_page == 'college' %} active {% endif %} ml-4">
-                    <a class="nav-link" href="{{ url_for('views.colleges_home') }}"><i class="fas fa-university"></i>
+                    <a class="nav-link" href="{{ url_for('colleges.colleges_home') }}"><i class="fas fa-university"></i>
                         College
                         {% if active_page == 'college' %} <span class="sr-only">(current)</span> {% endif %}
 
                     </a>
                 </li>
                 <li class="nav-item {% if active_page == 'professor' %} active {% endif %} ml-4">
-                    <a class="nav-link" href="{{ url_for('views.professors_home') }}"><i class="fas fa-user-tie"></i>
+                    <a class="nav-link" href="{{ url_for('professors.professors_home') }}"><i
+                            class="fas fa-user-tie"></i>
                         Professor
                         {% if active_page == 'professor' %} <span class="sr-only">(current)</span> {% endif %}
 
                     </a>
                 </li>
                 <li class="nav-item {% if active_page == 'about' %} active {% endif %} ml-4">
-                    <a class="nav-link" href="{{ url_for('views.about') }}"><i class="fas fa-info"></i> About
+                    <a class="nav-link" href="{{ url_for('about.about') }}"><i class="fas fa-info"></i> About
                         {% if active_page == 'about' %} <span class="sr-only">(current)</span> {% endif %}
                     </a>
                 </li>
@@ -169,24 +168,28 @@
 </div>
 
 <!-- JQuery -->
-<script type="text/javascript" src="static/MDB-Free_4.19.2/js/jquery.min.js"></script>
+<script type="text/javascript"
+        src="{{ url_for('static', filename='MDB-Free_4.19.2/js/jquery.min.js') }}"></script>
+
 <!-- Bootstrap tooltips -->
-<script type="text/javascript" src="static/MDB-Free_4.19.2/js/popper.min.js"></script>
+<script type="text/javascript"
+        src="{{ url_for('static', filename='MDB-Free_4.19.2/js/popper.min.js') }}"></script>
+
 <!-- Bootstrap core JavaScript -->
-<script type="text/javascript" src="static/MDB-Free_4.19.2/js/bootstrap.min.js"></script>
+<script type="text/javascript"
+        src="{{ url_for('static', filename='MDB-Free_4.19.2/js/bootstrap.min.js') }}"></script>
+
 <!-- MDB core JavaScript -->
-<script type="text/javascript" src="static/MDB-Free_4.19.2/js/mdb.min.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='MDB-Free_4.19.2/js/mdb.min.js') }}"></script>
+
 <!-- MDBootstrap Datatables  -->
-<script type="text/javascript" src="static/MDB-Free_4.19.2/js/addons/datatables.min.js"></script>
+<script type="text/javascript"
+        src="{{ url_for('static', filename='MDB-Free_4.19.2/js/addons/datatables.min.js') }}"></script>
 
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js'"></script>
 
-<!-- <script>
-    type = "text/javascript"
-    src = "{{ url_for('static', filename='index.js') }}"
-  </script> -->
 
-<script type="text/javascript" src="static/index.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='index.js') }}"></script>
 
 </body>
 

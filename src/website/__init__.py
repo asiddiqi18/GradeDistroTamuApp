@@ -13,10 +13,12 @@ def create_app(debug=False):
     db.init_app(app)
 
     if not debug:
-        from .views import views, page_not_found
+        from src.website.views import colleges, professors, about
 
-        app.register_blueprint(views, url_prefix='/')
-        app.register_error_handler(404, page_not_found)
+        app.register_blueprint(colleges.bp)
+        app.register_blueprint(professors.bp)
+        app.register_blueprint(about.bp)
+        # app.register_error_handler(404, page_not_found)
 
     create_database(app)
 
