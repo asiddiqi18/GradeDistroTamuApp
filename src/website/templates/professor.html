@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% set active_page = "home" %}
+{% set active_page = "professor" %}
 
 {% block title %}Grades{% endblock %}
 {% from "_render_field.html" import render_field, render_string_field %}
@@ -10,83 +10,26 @@
     <br/>
     <div class="text-center border border-light p-5 mb-5">
 
-        <ul class="nav nav-pills nav-fill mb-4 " id="pills-tab" role="tablist">
+        <p class="h4 mb-4">Sort by professors</p>
 
-            <li class="nav-item">
-                <a class="nav-link " id="pills-home-tab" data-toggle="pill"
-                   href="#pills-home" role="tab" aria-controls="pills-home"
-                   aria-selected="false">Sort by College <i
-                        class="fas fa-university"></i></a>
-            </li>
+        <p class="mb-5">Know which professors to take and avoid!</p>
 
-            <li class="nav-item">
-                <a class="nav-link active" id="pills-profile-tab"
-                   data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile"
-                   aria-selected="true">Sort by Professor <i
-                        class="fas fa-user-tie"></i></a>
-            </li>
+        <!-- Professor -->
+        <form method="GET" class="needs-validation" action="/professors/results" novalidate>
 
-        </ul>
-
-        <div class="tab-content pt-2 pl-1" id="pills-tabContent">
-
-            <div class="tab-pane fade" id="pills-home" role="tabpanel"
-                 aria-labelledby="pills-home-tab">
-                <p class="h4 mb-4">Sort by college, year and semester</p>
-
-                <p class="mb-5">Know which professors or courses to take and avoid!</p>
-
-                <!-- College -->
-                <form class="mt-5" method="GET" action="results" id="form_results">
-
-                    <!-- College -->
-                    <div class="form-group mx-3">{{ render_field(form.college, placeholder=form.college.label.text) }}</div>
-
-
-                    <div class="form-row">
-                        <!-- Semester -->
-                        <div class="form-group col-md mx-3 mt-3 mb-1">
-                            {{ render_field(form.semester, placeholder=form.semester.label.text) }}
-                        </div>
-
-                        <!-- Year -->
-                        <div class="form-group col-md mx-3 mt-3 mb-1">
-                            {{ render_field(form.year, placeholder=form.year.label.text) }}
-                        </div>
-                    </div>
-
-                    <!-- Send button -->
-                    <div class="form-group mb-1">
-                        <button class="btn btn-info mt-4 px-auto" type="submit">Search</button>
-                    </div>
-
-                </form>
-            </div>
-
-            <div class="tab-pane fade show active " id="pills-profile"
-                 role="tabpanel" aria-labelledby="pills-profile-tab">
-                <p class="h4 mb-4">Sort by professors</p>
-
-                <p class="mb-5">Know which professors to take and avoid!</p>
-
-                <!-- Professor -->
-                <form method="GET" class="needs-validation" action="professors" novalidate>
-
-                    <div class="row">
-                        <div class="col-md-6 offset-md-3">
-                            <div class="form-group mx-3">{{ render_string_field(form.professor,
+            <div class="row">
+                <div class="col-md-6 offset-md-3">
+                    <div class="form-group mx-3">{{ render_string_field(form.professor,
                             placeholder=form.professor.label.text) }}</div>
-                            <div class="invalid-feedback">This field is required.</div>
-                        </div>
-                    </div>
-
-                    <!-- Send button -->
-                    <div class="form-group mb-1">
-                        <button class="btn btn-info mt-4 px-auto" type="submit">Search</button>
-                    </div>
-                </form>
+                    <div class="invalid-feedback">This field is required.</div>
+                </div>
             </div>
-        </div>
+
+            <!-- Send button -->
+            <div class="form-group mb-1">
+                <button class="btn btn-info mt-4 px-auto" type="submit">Search</button>
+            </div>
+        </form>
     </div>
 
     {% if grade_results == None %}
@@ -94,7 +37,7 @@
     {% else %}
 
         {% if grade_results|length == 0 %}
-            <h1 class="text-center">No results.</h1>
+{#            <h1 class="text-center">No results.</h1>#}
         {% else %}
 
             <hr>

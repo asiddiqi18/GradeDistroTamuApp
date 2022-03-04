@@ -7,7 +7,7 @@ DB_NAME = "grades.db"
 
 
 def create_app(debug=False):
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='./static', template_folder='./templates')
     app.config['SECRET_KEY'] = 'this is a secret key :)'
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     db.init_app(app)

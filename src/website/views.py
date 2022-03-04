@@ -14,11 +14,20 @@ semesters = {'spring', 'summer', 'fall', 'all'}
 
 
 @views.route('/')
-def home():
+@views.route('/colleges')
+def colleges_home():
     form = CourseForm()
     url = request.url
     print(url)
-    return render_template("home.html", grade_results=None, form=form, url=url)
+    return render_template("college.html", grade_results=None, form=form, url=url)
+
+
+@views.route('/professors')
+def professors_home():
+    form = CourseForm()
+    url = request.url
+    return render_template("professor.html", grade_results=[], form=form, url=url, averages=None, trend_year=None,
+                           trend_gpa=None)
 
 
 @views.route('/about', methods=["GET"])
@@ -36,11 +45,11 @@ def handle_invalid_prof_params(prof):
         return 'Professor names can only contain letters.'
 
 
-@views.route('/professors', methods=["GET", "POST"])
-def professor():
+@views.route('/professors/results', methods=["GET", "POST"])
+def professors():
     def render_default(flash_message, _form, _url):
         flash(flash_message, 'error')
-        return render_template("prof.html", grade_results=[], form=_form, url=_url, averages=None, trend_year=None,
+        return render_template("professor.html", grade_results=[], form=_form, url=_url, averages=None, trend_year=None,
                                trend_gpa=None)
 
     url = request.url
@@ -95,7 +104,7 @@ def professor():
     tuples = zip(*sorted_pairs)
     years_sorted, gpa_sorted = [list(tup) for tup in tuples]
 
-    return render_template("prof.html", grade_results=grades, form=form, url=url, averages=averages,
+    return render_template("professor.html", grade_results=grades, form=form, url=url, averages=averages,
                            trend_year=years_sorted, trend_gpa=gpa_sorted, courses=courses_taught)
 
 
@@ -141,38 +150,38 @@ def get_grades(college, year, semester):
     return grades
 
 
-@views.route('/results', methods=["GET", "POST"])
-def colleges_result():
+@views.route('/colleges/results', methods=["GET", "POST"])
+def colleges():
     def render_default(flash_message, _form, _url):
         flash(flash_message, 'error')
-        return render_template("home.html", grade_results=[], form=form, url=url)
+        return render_template("college.html", grade_results=[], form=form, url=url)
 
     url = request.url
-    college = request.args.get('college').lower()
-    semester = request.args.get('semester').lower()
-    year = request.args.get('year').lower()
-    form = CourseForm(college=college, semester=semester, year=year)
+    college_request = request.args.get('college').lower()
+    semester_request = request.args.get('semester').lower()
+    year_request = request.args.get('year').lower()
+    form = CourseForm(college=college_request, semester=semester_request, year=year_request)
 
     try:
-        grades = get_grades(college, year, semester)
+        grades = get_grades(college_request, year_request, semester_request)
     except ValueError as e:
         return render_default(str(e), form, url)
 
-    return render_template("home.html", grade_results=grades, form=form, url=url)
+    return render_template("college.html", grade_results=grades, form=form, url=url)
 
 
 @views.route('/api/v1/resources/grades', methods=['GET'])
 def api_grades():
-    college = request.args.get('college').lower()
-    semester = request.args.get('semester').lower()
-    year = request.args.get('year').lower()
+    college_request = request.args.get('college').lower()
+    semester_request = request.args.get('semester').lower()
+    year_request = request.args.get('year').lower()
 
     try:
-        grades = get_grades(college, year, semester)
+        grades = get_grades(college_request, year_request, semester_request)
     except ValueError as e:
         return str(e)
 
-    pdf_data = PdfParserDB(college, int(year), semester)
+    pdf_data = PdfParserDB(college_request, int(year_request), semester_request)
     grades_dict = pdf_data.get_dictionary(grades)
     return grades_dict
 
