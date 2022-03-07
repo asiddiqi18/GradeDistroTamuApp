@@ -49,6 +49,12 @@
         <h1 class="mb-5">Stats
             for {{ form.course_abbr.data.upper() }} {{ form.course_num.data }}</h1>
 
+         <h4 class="mt-3 mb-5"> The average GPA for this class is <strong
+                            class="indigo-text">{{ "%.3f"|format(averages.gpa) }}</strong> over a span of <strong
+                            class="indigo-text">{{ grade_results|length }}</strong> sections taught from <strong
+                            class="indigo-text">{{ trend_year[0] }}</strong> to <strong
+                            class="indigo-text">{{ trend_year[-1] }}</strong>.</h4>
+
         <div class="card mb-5">
                 <div class="card-header text-white unique-color">
                     <i class="far fa-chart-bar"></i> Charts
@@ -67,7 +73,7 @@
                                 labels: ['A', 'B', 'C', 'D', 'F', 'Q-drop'],
                                 datasets: [
                                     {
-                                        label: "Total Grade Distribution for {{ averages.professor }} (number of students)",
+                                        label: "Total Grade Distribution (number of students)",
                                         backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850", "#8a1806"],
                                         data: [{{ averages.amount_a }}, {{ averages.amount_b }}, {{ averages.amount_c }}, {{ averages.amount_d }}, {{ averages.amount_f }}, {{ averages.other_q }}]
                                     }
