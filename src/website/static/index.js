@@ -16,3 +16,12 @@ function copyToClipboard() {
 
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function loading() {
+    await sleep(500)
+    $("#loading").show();
+    $("#content").hide();
+}

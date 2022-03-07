@@ -33,3 +33,8 @@ bottom: .5em;
         transform: translateX(-50%);
     }
 }
+
+div#loading {
+    display: none;
+    cursor: wait;
+    }
