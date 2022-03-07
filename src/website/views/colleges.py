@@ -1,45 +1,44 @@
 import sqlalchemy.orm
-from flask import Blueprint, render_template, request, flash
+from flask import Blueprint, render_template, request, flash, g
 import requests
 from datetime import date
 from src.parser_api.pdf_parser_model import PdfParserDB
 from src.website.models import Grades
 from src.website import db
-from src.website.forms import CourseForm
+from src.website.forms import CollegeForm
 from src.parser_api.college_lookup import get_colleges
+from src.website.views import render_default
 
 bp = Blueprint('colleges', __name__)
 colleges_json = get_colleges()
 semesters = {'spring', 'summer', 'fall', 'all'}
 
 
+@bp.before_request
+def get_url():
+    g.url = request.url
+
+
 @bp.route('/')
 @bp.route('/colleges')
 def colleges_home():
-    form = CourseForm()
-    url = request.url
-    print(url)
-    return render_template("college.html", grade_results=None, form=form, url=url)
+    form = CollegeForm()
+    return render_template("college.html", grade_results=None, form=form)
 
 
 @bp.route('/colleges/results', methods=["GET", "POST"])
 def colleges():
-    def render_default(flash_message, _form, _url):
-        flash(flash_message, 'error')
-        return render_template("college.html", grade_results=[], form=form, url=url)
-
-    url = request.url
     college_request = request.args.get('college').lower()
     semester_request = request.args.get('semester').lower()
     year_request = request.args.get('year').lower()
-    form = CourseForm(college=college_request, semester=semester_request, year=year_request)
+    form = CollegeForm(college=college_request, semester=semester_request, year=year_request)
 
     try:
         grades = get_grades(college_request, year_request, semester_request)
     except ValueError as e:
-        return render_default(str(e), form, url)
+        return render_default('college.html', str(e), form)
 
-    return render_template("college.html", grade_results=grades, form=form, url=url)
+    return render_template("college.html", grade_results=grades, form=form)
 
 
 def handle_invalid_college_params(college, semester, year) -> str:
@@ -103,4 +102,4 @@ def get_grades(college, year, semester):
 @bp.errorhandler(404)
 def page_not_found(e):
     # note that we set the 404 status explicitly
-    return render_template("not_found.html")
+    return render_template("errors.html")

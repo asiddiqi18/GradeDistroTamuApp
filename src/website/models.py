@@ -56,53 +56,65 @@ class Grades(db.Model):
         self.percent_d = self.amount_d / total
         self.percent_f = self.amount_f / total
 
-    @property
-    def serialize(self):
-        """Return object data in easily serializable format"""
-        serialize_dict = {
-            'id': self.id,
-            'college': self.college,
-            'year': self.year,
-            'semester': self.semester,
-            'department': self.department,
-            'course': self.course,
-            'section': self.section,
-            'amount_a': self.amount_a,
-            'percent_a': self.percent_a,
-            'amount_b': self.amount_b,
-            'percent_b': self.percent_b,
-            'amount_c': self.amount_c,
-            'percent_c': self.percent_c,
-            'amount_d': self.amount_d,
-            'percent_d': self.percent_d,
-            'amount_f': self.amount_f,
-            'percent_f': self.percent_f,
-            'total': self.total,
-            'gpa': self.gpa,
-            'other_i': self.other_i,
-            'other_s': self.other_s,
-            'other_u': self.other_u,
-            'other_q': self.other_q,
-            'other_x': self.other_x,
-            'other_total': self.other_total,
-            'professor': self.professor,
-            'instructor_id': self.instructor_id
-        }
-
-        return {u: str(v) for u, v in serialize_dict.items()}
-
-    @property
-    def serialize_many2many(self):
-        """
-       Return object's relations in easily serializable format.
-       NB! Calls many2many's serialize property.
-       """
-        return [item.serialize for item in self.many2many]
-
     def __repr__(self):
         return f'''<Grades: [
             College: {self.college} Year: {self.year},  Semester: {self.semester},  Department: {self.department}, 
             Course: {self.course},  GPA: {self.gpa}, Professor: {self.professor}]>'''
+
+
+class GradesMultiple(Grades):
+
+    def __init__(self, other: [Grades]):
+        super().__init__()
+
+        self.total_gpa_year = {}
+        self.total_courses_year = {}
+
+        self.total_gpa = 0
+        self.total_courses = 0
+
+        self.courses_taught = set()
+
+        if not other:
+            return
+
+        self.professor = other[0].professor
+        for x in other:
+            self.add(x)
+
+        self.set_percents()
+        self.gpa = self.total_gpa / self.total_courses
+
+    def add(self, other: Grades):
+        self.amount_a += other.amount_a
+        self.amount_b += other.amount_b
+        self.amount_c += other.amount_c
+        self.amount_d += other.amount_d
+        self.amount_f += other.amount_f
+        self.other_q += other.other_q
+        self.courses_taught.add(f"{other.department} {other.course}")
+        self.total_courses_year[other.year] = self.total_courses_year.get(other.year, 0) + 1
+        self.total_gpa += other.gpa
+        self.total_courses += 1
+        self.total += other.total
+        self.total_gpa_year[other.year] = self.total_gpa_year.get(other.year, 0) + other.gpa
+
+    def set_percents(self):
+        self.percent_a = self.amount_a / self.total
+        self.percent_b = self.amount_b / self.total
+        self.percent_c = self.amount_c / self.total
+        self.percent_d = self.amount_d / self.total
+        self.percent_f = self.amount_f / self.total
+
+    def sorted_years_and_gpa(self):
+        avg_dict = {year: float(self.total_gpa_year[year] / self.total_courses_year[year]) for year in
+                    self.total_gpa_year.keys()}
+
+        years = list(avg_dict.keys())
+        gpa_list = list(avg_dict.values())
+
+        zipped_lists = zip(*sorted(zip(years, gpa_list)))
+        return [list(tup) for tup in zipped_lists]
 
 
 class Instructor(db.Model):

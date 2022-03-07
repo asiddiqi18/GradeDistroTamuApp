@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "layout.html" %}
 {% set active_page = "professor" %}
 
 {% block title %}Grades{% endblock %}
@@ -6,7 +6,7 @@
 
 {% block content %}
 
-    <h1 class="mt-5 text-center">Texas A&M Grade Distribution</h1>
+    <h1 class="mt-5 text-center">Texas A&M Professor Grades</h1>
     <br/>
     <div class="text-center border border-light p-5 mb-5">
 
@@ -137,7 +137,6 @@
                     <th class="th-sm">D</th>
                     <th class="th-sm">F</th>
                     <th class="th-sm">GPA</th>
-                    <th class="th-sm">Instructor</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -162,23 +161,9 @@
                             <div class="text-muted">({{ "%.2f"|format(grade.percent_f) }})%</div>
                         </td>
                         <td>{{ "%.3f"|format(grade.gpa) }}</td>
-                        <td>{{ grade.professor }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
-                <tfoot>
-                <tr>
-                    <th>Department</th>
-                    <th>Course</th>
-                    <th>Year</th>
-                    <th>Section</th>
-                    <th>A</th>
-                    <th>B</th>
-                    <th>C</th>
-                    <th>D</th>
-                    <th>F</th>
-                </tr>
-                </tfoot>
             </table>
         {% endif %}
 

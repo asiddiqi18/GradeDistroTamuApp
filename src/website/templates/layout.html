@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='image.png') }}"/>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='MDB-Free_4.19.2/css/bootstrap.min.css') }}">
+    <!-- Material Design Bootstrap -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='MDB-Free_4.19.2/css/mdb.min.css') }}">
+    <!-- MDBootstrap Datatables  -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='MDB-Free_4.19.2/css/addons/datatables.min.css') }}">
+
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <title>{% block title %}Home{% endblock %}</title>
+</head>
+
+<body>
+<!--Navbar-->
+<div class="d-flex flex-column min-vh-100">
+
+    {% include '_nav.html' %}
+
+    <main class="flex-fill">
+
+        <div class="container">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        {% if category == 'error' %}
+                            <div class="alert alert-danger alert-dismissable fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% elif category == 'success' %}
+                            <div class="alert alert-success alert-dismissable fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %} {% endblock %}
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="page-footer font-small blue">
+
+        <!-- Copyright -->
+        <div class="footer-copyright text-center unique-color py-3">© 2021 Copyright:
+            <a href="#"> TAMU Grade Distribution</a>
+        </div>
+
+    </footer>
+</div>
+
+<!-- JQuery -->
+<script type="text/javascript"
+        src="{{ url_for('static', filename='MDB-Free_4.19.2/js/jquery.min.js') }}"></script>
+
+<!-- Bootstrap tooltips -->
+<script type="text/javascript"
+        src="{{ url_for('static', filename='MDB-Free_4.19.2/js/popper.min.js') }}"></script>
+
+<!-- Bootstrap core JavaScript -->
+<script type="text/javascript"
+        src="{{ url_for('static', filename='MDB-Free_4.19.2/js/bootstrap.min.js') }}"></script>
+
+<!-- MDB core JavaScript -->
+<script type="text/javascript" src="{{ url_for('static', filename='MDB-Free_4.19.2/js/mdb.min.js') }}"></script>
+
+<!-- MDBootstrap Datatables  -->
+<script type="text/javascript"
+        src="{{ url_for('static', filename='MDB-Free_4.19.2/js/addons/datatables.min.js') }}"></script>
+
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js'"></script>
+
+
+<script type="text/javascript" src="{{ url_for('static', filename='index.js') }}"></script>
+
+</body>
+
+</html>

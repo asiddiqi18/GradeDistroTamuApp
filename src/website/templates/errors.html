@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "layout.html" %}
 {% set active_page = "none" %}
 
 
@@ -9,9 +9,9 @@
     <div class="container">
         <div class="row">
             <div class="col text-center">
-                <h1 class="m-5 text-center">Page not found</h1>
+                <h1 class="m-5 text-center">{{ msg }}</h1>
 
-                <a href="{{ url_for('views.colleges_home') }}" class="btn btn-default">Return Home</a>
+                <a href="{{ url_for('colleges.colleges_home') }}" class="btn btn-default">Return Home</a>
             </div>
         </div>
     </div>

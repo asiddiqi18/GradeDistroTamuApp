@@ -3,7 +3,9 @@
     {{ field(class_='form-control browser-default custom-select', **kwargs)|safe }}
 {% endmacro %}
 
-{% macro render_string_field(field) %}
+{% macro render_string_field(field, help="") %}
 <label for="{{ field.name }}">{{ field.label.text }}</label>
     {{ field(class_='form-control browser-default form-control', **kwargs)|safe }}
+
+<small class="form-text text-muted">{{ help }}</small>
 {% endmacro %}

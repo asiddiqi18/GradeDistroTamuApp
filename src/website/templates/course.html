@@ -1,0 +1,139 @@
+{% extends "layout.html" %}
+{% set active_page = "courses" %}
+
+
+{% block title %}Grades{% endblock %}
+{% from "_render_field.html" import render_field, render_string_field %}
+
+
+{% block content %}
+    <h1 class="mt-5 text-center">Texas A&M College Grades</h1>
+    <br/>
+    <div class="text-center border border-light p-5 mb-5">
+
+        <p class="h4 mb-4">Sort by college, year and semester</p>
+
+        <p class="mb-5">Know which courses to take and avoid!</p>
+
+        <!-- Course -->
+        <form class="mt-5" method="GET" action="/courses/results" id="form_results">
+
+            <div class="d-flex justify-content-center">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group ">
+                            {{ render_string_field(form.course_abbr, placeholder='', help='such as ECEN, POLS, CHEM, etc...') }}
+                        </div>
+                        <div class="invalid-feedback">This field is required.</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group ">
+                            {{ render_string_field(form.course_num, placeholder='') }}
+                        </div>
+                        <div class="invalid-feedback">This field is required.</div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Send button -->
+            <div class="form-group mb-1">
+                <button class="btn btn-info mt-4 px-auto" type="submit">Search</button>
+            </div>
+
+        </form>
+
+    </div>
+    {% if grade_results != None and grade_results|length != 0 %}
+        <h1 class="mb-5">Stats
+            for {{ form.course_abbr.data.upper() }} {{ form.course_num.data }}</h1>
+
+        <div class="card mb-5">
+                <div class="card-header text-white unique-color">
+                    <i class="far fa-chart-bar"></i> Charts
+                </div>
+                <div class="card-body p-5">
+                    <div>
+                        <canvas id="gradeDistChart"></canvas>
+                    </div>
+
+
+                    <script>
+                        // Bar chart
+                        new Chart(document.getElementById("gradeDistChart"), {
+                            type: 'bar',
+                            data: {
+                                labels: ['A', 'B', 'C', 'D', 'F', 'Q-drop'],
+                                datasets: [
+                                    {
+                                        label: "Total Grade Distribution for {{ averages.professor }} (number of students)",
+                                        backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850", "#8a1806"],
+                                        data: [{{ averages.amount_a }}, {{ averages.amount_b }}, {{ averages.amount_c }}, {{ averages.amount_d }}, {{ averages.amount_f }}, {{ averages.other_q }}]
+                                    }
+                                ]
+                            },
+                            options: {
+                                legend: {display: false},
+                                title: {
+                                    display: true,
+                                    text: 'Grade distribution bar chart'
+                                }
+                            }
+                        });
+                    </script>
+
+                </div>
+            </div>
+
+
+        <table id="dtBasicExample" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+            <thead>
+            <tr>
+                <th class="th-sm">Semester</th>
+                <th class="th-sm">Year</th>
+                <th class="th-sm">A</th>
+                <th class="th-sm">B</th>
+                <th class="th-sm">C</th>
+                <th class="th-sm">D</th>
+                <th class="th-sm">F</th>
+                <th class="th-sm">GPA</th>
+                <th class="th-sm">Instructor</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for grade in grade_results %}
+                <tr>
+                    <td>{{ grade.semester.capitalize() }}</td>
+                    <td>{{ grade.year }}</td>
+                    <td>
+                        {{ grade.amount_a }}
+                        <div class="text-muted">({{ "%.2f"|format(grade.percent_a) }}%)</div>
+                    </td>
+                    <td>
+                        {{ grade.amount_b }}
+                        <div class="text-muted">({{ "%.2f"|format(grade.percent_b) }})%</div>
+                    </td>
+                    <td>
+                        {{ grade.amount_c }}
+                        <div class="text-muted">({{ "%.2f"|format(grade.percent_c) }})%</div>
+                    </td>
+                    <td>
+                        {{ grade.amount_d }}
+                        <div class="text-muted">({{ "%.2f"|format(grade.percent_d) }})%</div>
+                    </td>
+                    <td>
+                        {{ grade.amount_f }}
+                        <div class="text-muted">({{ "%.2f"|format(grade.percent_f) }})%</div>
+                    </td>
+                    <td>{{ "%.3f"|format(grade.gpa) }}</td>
+                    <td>
+                        <a href="{{ url_for('professors.professors', professor=grade.professor) }}">{{ grade.professor }}</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    {% endif %}
+{% endblock %}

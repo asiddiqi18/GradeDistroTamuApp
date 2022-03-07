@@ -1,0 +1,104 @@
+<nav class="navbar navbar-expand-lg navbar-dark unique-color mb-4">
+
+    <!-- Navbar brand -->
+    <a class="navbar-brand ml-3" href="/">TAMU Grade Distribution Database</a>
+
+    <!-- Collapse button -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#basicExampleNav"
+            aria-controls="basicExampleNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="basicExampleNav">
+
+        {% set active_page = active_page|default('college') -%}
+
+        <!-- Links -->
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item {% if active_page == 'college' %} active {% endif %} ml-4">
+                <a class="nav-link" href="{{ url_for('colleges.colleges_home') }}"><i
+                        class="fas fa-university mr-1"></i>
+                    College
+                    {% if active_page == 'college' %} <span class="sr-only">(current)</span> {% endif %}
+
+                </a>
+            </li>
+            <li class="nav-item {% if active_page == 'professor' %} active {% endif %} ml-4">
+                <a class="nav-link" href="{{ url_for('professors.professors_home') }}"><i
+                        class="fas fa-user-tie mr-1"></i>
+                    Professor
+                    {% if active_page == 'professor' %} <span class="sr-only">(current)</span> {% endif %}
+
+                </a>
+            </li>
+            <li class="nav-item {% if active_page == 'courses' %} active {% endif %} ml-4">
+                <a class="nav-link" href="{{ url_for('courses.courses_home') }}"><i
+                        class="fas fa-book-reader mr-1"></i>
+                    Courses
+                    {% if active_page == 'courses' %} <span class="sr-only">(current)</span> {% endif %}
+
+                </a>
+            </li>
+            <li class="nav-item {% if active_page == 'about' %} active {% endif %} ml-4">
+                <a class="nav-link" href="{{ url_for('about.about') }}"><i class="fas fa-info mr-1"></i> About
+                    {% if active_page == 'about' %} <span class="sr-only">(current)</span> {% endif %}
+                </a>
+            </li>
+        </ul>
+
+        {% if active_page != 'none' %}
+            <ul class="navbar-nav ml-auto nav-flex-icons">
+                <li class="nav-item" data-toggle="modal" data-target="#centralModalSuccess">
+                    <a class="nav-link waves-effect waves-light">
+                        <i class="fas fa-link"></i>
+                    </a>
+                </li>
+            </ul>
+
+
+            <!-- Central Modal Medium Success -->
+            <div class="modal fade" id="centralModalSuccess" tabindex="-1" role="dialog"
+                 aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-notify modal-success" role="document">
+                    <!--Content-->
+                    <div class="modal-content">
+                        <!--Header-->
+                        <div class="modal-header">
+                            <p class="heading lead">Share this page</p>
+
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true" class="white-text">&times;</span>
+                            </button>
+                        </div>
+
+                        <!--Body-->
+                        <div class="modal-body">
+                            <div class="text-center">
+                                <i class="fas fa-share fa-4x mb-3 animated rotateIn"></i>
+                                <div class="text-center">
+                                    <label for="page-link">Share a link to this page:</label><textarea id="page-link"
+                                                                                                       class="form-control rounded-0 textarea-non-resize"
+                                                                                                       rows="1"
+                                                                                                       readonly>{{ g.url }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--Footer-->
+                        <div class="modal-footer justify-content-center">
+                            <a type="button" class="btn btn-success" onclick="copyToClipboard()" data-dismiss="modal">Copy
+                                <i
+                                        class="fas fa-link ml-1 text-white"></i></a>
+                            <a type="button" class="btn btn-outline-success waves-effect"
+                               data-dismiss="modal">Back</a>
+                        </div>
+                    </div>
+                    <!--/.Content-->
+                </div>
+            </div>
+            <!-- Central Modal Medium Success-->
+            <!-- Links -->
+        {% endif %}
+    </div>
+</nav>
