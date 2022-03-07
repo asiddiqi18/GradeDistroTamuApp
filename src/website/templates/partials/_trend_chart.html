@@ -1,0 +1,33 @@
+<div>
+    <canvas id="trendLine"></canvas>
+</div>
+
+<script>
+    // Bar chart
+    new Chart(document.getElementById("trendLine"), {
+        type: 'line',
+        data: {
+            labels: {{ trend_year }},
+            datasets: [
+                {
+                    label: "Average GPA Across the Years",
+                    borderColor: 'rgb(75, 192, 192)',
+                    data: {{ trend_gpa }}
+                },
+            ]
+        },
+        options: {
+            legend: {display: false},
+            title: {
+                display: true,
+                text: 'Grade distribution bar chart'
+            },
+            scales: {
+                y: {
+                    min: 0,
+                    max: 4,
+                }
+            }
+        }
+    });
+</script>

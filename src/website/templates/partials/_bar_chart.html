@@ -1,0 +1,27 @@
+<div>
+    <canvas id="gradeDistChart"></canvas>
+</div>
+
+<script>
+    // Bar chart
+    new Chart(document.getElementById("gradeDistChart"), {
+        type: 'bar',
+        data: {
+            labels: ['A', 'B', 'C', 'D', 'F', 'Q-drop'],
+            datasets: [
+                {
+                    label: "Total Grade Distribution (number of students)",
+                    backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850", "#8a1806"],
+                    data: [{{ averages.amount_a }}, {{ averages.amount_b }}, {{ averages.amount_c }}, {{ averages.amount_d }}, {{ averages.amount_f }}, {{ averages.other_q }}]
+                }
+            ]
+        },
+        options: {
+            legend: {display: false},
+            title: {
+                display: true,
+                text: 'Grade distribution bar chart'
+            }
+        }
+    });
+</script>
