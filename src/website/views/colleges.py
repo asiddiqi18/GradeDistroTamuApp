@@ -58,6 +58,11 @@ def handle_invalid_college_params(college, semester, year) -> str:
 
 @bp.route('/api/v1/resources/grades', methods=['GET'])
 def api_grades():
+    required_params = ['college', 'semester', 'year']
+    for req in required_params:
+        if req not in request.args:
+            return f"Expected {req} parameter"
+
     college_request = request.args.get('college').lower()
     semester_request = request.args.get('semester').lower()
     year_request = request.args.get('year').lower()
@@ -98,8 +103,3 @@ def get_grades(college, year, semester):
 
     return grades
 
-
-@bp.errorhandler(404)
-def page_not_found(e):
-    # note that we set the 404 status explicitly
-    return render_template("errors.html")
