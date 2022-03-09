@@ -1,11 +1,18 @@
 {% macro render_field(field) %}
-<label for="{{ field.name }}">{{ field.label.text }}</label>
-    {{ field(class_='form-control browser-default custom-select', **kwargs)|safe }}
+    <label for="{{ field.name }}">{{ field.label.text }}</label>
+    {{ field(class_='form-control browser-default custom-select selectpicker', **kwargs)|safe }}
 {% endmacro %}
 
+{% macro render_field_search(field) %}
+    <label class="font-weight-bold" for="{{ field.name }}">{{ field.label.text }}</label>
+    {{ field(class_='form-control browser-default selectpicker show-tick', **kwargs)|safe }}
+{% endmacro %}
+
+
+
 {% macro render_string_field(field, help="") %}
-<label for="{{ field.name }}">{{ field.label.text }}</label>
+    <label for="{{ field.name }}">{{ field.label.text }}</label>
     {{ field(class_='form-control browser-default form-control', **kwargs)|safe }}
 
-<small class="form-text text-muted">{{ help }}</small>
+    <small class="form-text text-muted">{{ help }}</small>
 {% endmacro %}

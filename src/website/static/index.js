@@ -20,8 +20,13 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// Used by load spinner
 async function loading() {
     await sleep(500)
     $("#loading").show();
     $("#content").hide();
 }
+
+$(function () {
+    $('.select-search').selectpicker();
+});

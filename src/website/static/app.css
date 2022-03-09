@@ -8,7 +8,7 @@ table.dataTable thead .sorting_desc:after,
 table.dataTable thead .sorting_desc:before,
 table.dataTable thead .sorting_desc_disabled:after,
 table.dataTable thead .sorting_desc_disabled:before {
-bottom: .5em;
+    bottom: .5em;
 }
 
 /* body {
@@ -23,11 +23,10 @@ bottom: .5em;
 .textarea-non-resize {
     resize: none;
     white-space: nowrap;
-  }
+}
 
 @media (min-width: 768px) {
-.navbar-brand
-    {
+    .navbar-brand {
         position: absolute;
         left: 50%;
         transform: translateX(-50%);
@@ -37,4 +36,8 @@ bottom: .5em;
 div#loading {
     display: none;
     cursor: wait;
-    }
+}
+
+.border-blue-grey {
+    border-color: #607d8b !important;
+}

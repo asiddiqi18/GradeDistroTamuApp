@@ -9,7 +9,8 @@
 {% block content %}
     <h1 class="mt-5 text-center">Texas A&M College Grades</h1>
     <br/>
-    <div class="text-center border border-light p-5 mb-5">
+    <div class="text-center border border-blue-grey rounded-right z-depth-1 p-5 mb-5">
+
 
         <p class="h4 mb-4">Sort by college, year and semester</p>
 
@@ -37,9 +38,8 @@
             </div>
 
             <!-- Send button -->
-            <div class="form-group mb-1">
-                <button class="btn btn-info mt-4 px-auto" type="submit">Search</button>
-            </div>
+            {% include 'partials/_search.html' %}
+
         </form>
 
     </div>
