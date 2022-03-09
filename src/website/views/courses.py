@@ -19,8 +19,7 @@ def courses_home():
 
 
 def get_courses(abbr, num):
-    """ Retrieves list of grades from database if records exist or from PDF.
-    Raises ValueError for invalid parameters """
+    """ Retrieves stats for the specified course from the database """
 
     grades_query: sqlalchemy.orm.Query = Grades.query
 
@@ -44,7 +43,6 @@ def colleges():
     averages = GradesMultiple(grades)
 
     years_sorted, gpa_sorted = averages.sorted_years_and_gpa()
-    courses_taught = ", ".join(averages.courses_taught)
 
     return render_template("course.html", grade_results=grades, form=form, averages=averages,
                            trend_year=years_sorted, trend_gpa=gpa_sorted)
