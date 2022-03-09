@@ -2,7 +2,7 @@
 {% set active_page = "college" %}
 
 {% block title %}Grades{% endblock %}
-{% from "partials/_render_field.html" import render_field, render_string_field, render_field_search %}
+{% from "partials/_render_field.html" import render_field, render_string_field %}
 
 
 
@@ -22,21 +22,21 @@
 
             <!-- College -->
             <div class="form-group mx-3">
-                {{ render_field_search(form.college, **{'data-live-search': "true", 'data-style': 'btn-outline-blue-grey'}) }}
+                {{ render_field(form.college) }}
             </div>
 
             <!-- Semester / Year-->
             <div class="form-row">
                 <!-- Semester -->
                 <div class="form-group col-md mx-3 mt-3 mb-1">
-                    {{ render_field_search(form.semester, **{'data-live-search': "true", 'data-style': 'btn-outline-blue-grey'}) }}
+                    {{ render_field(form.semester, **{'data-live-search': "true", 'data-style': 'btn-outline-blue-grey'}) }}
                 </div>
 
 
 
                 <!-- Year -->
                 <div class="form-group col-md mx-3 mt-3 mb-1">
-                    {{ render_field_search(form.year, **{'data-live-search': "true", 'data-style': 'btn-outline-blue-grey'}) }}
+                    {{ render_field(form.year, **{'data-live-search': "true", 'data-style': 'btn-outline-blue-grey'}) }}
                 </div>
 
 
