@@ -52,52 +52,66 @@
                 <i class="far fa-chart-bar"></i> Charts
             </div>
             <div class="card-body p-5">
-                {% include 'partials/_bar_chart.html' %}
-                {% include 'partials/_trend_chart.html' %}
+                <div class="row">
+                    <div class="col-6">
+                        {% include 'partials/_bar_chart.html' %}
+                    </div>
+                    <div class="col-6">
+                        {% include 'partials/_trend_chart.html' %}
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Include table -->
-        <table id="dtBasicExample" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
-            <thead>
-            <tr>
-                <th class="th-sm">Department</th>
-                <th class="th-sm">Course / Section</th>
-                <th class="th-sm">Year</th>
-                <th class="th-sm">A</th>
-                <th class="th-sm">B</th>
-                <th class="th-sm">C</th>
-                <th class="th-sm">D</th>
-                <th class="th-sm">F</th>
-                <th class="th-sm">GPA</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for grade in grade_results %}
-                <tr>
-                    <td>{{ grade.department }}</td>
-                    <td>{{ grade.course }} - {{ grade.section }}</td>
-                    <td>{{ grade.year }}</td>
-                    <td>{{ grade.amount_a }}
-                        <div class="text-muted">({{ "%.2f"|format(grade.percent_a) }}%)</div>
-                    </td>
-                    <td>{{ grade.amount_b }}
-                        <div class="text-muted">({{ "%.2f"|format(grade.percent_b) }})%</div>
-                    </td>
-                    <td>{{ grade.amount_c }}
-                        <div class="text-muted">({{ "%.2f"|format(grade.percent_c) }})%</div>
-                    </td>
-                    <td>{{ grade.amount_d }}
-                        <div class="text-muted">({{ "%.2f"|format(grade.percent_d) }})%</div>
-                    </td>
-                    <td>{{ grade.amount_f }}
-                        <div class="text-muted">({{ "%.2f"|format(grade.percent_f) }})%</div>
-                    </td>
-                    <td>{{ "%.3f"|format(grade.gpa) }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        <div class="card mb-5">
+            <div class="card-header text-white unique-color">
+                <i class="fas fa-table"></i> Table
+            </div>
+            <div class="card-body p-5">
+                <!-- Include table -->
+                <table id="dtBasicExample" class="table table-striped table-bordered table-sm" cellspacing="0"
+                       width="100%">
+                    <thead>
+                    <tr>
+                        <th class="th-sm">Department</th>
+                        <th class="th-sm">Course / Section</th>
+                        <th class="th-sm">Year</th>
+                        <th class="th-sm">A</th>
+                        <th class="th-sm">B</th>
+                        <th class="th-sm">C</th>
+                        <th class="th-sm">D</th>
+                        <th class="th-sm">F</th>
+                        <th class="th-sm">GPA</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for grade in grade_results %}
+                        <tr>
+                            <td>{{ grade.department }}</td>
+                            <td>{{ grade.course }} - {{ grade.section }}</td>
+                            <td>{{ grade.year }}</td>
+                            <td>{{ grade.amount_a }}
+                                <div class="text-muted">({{ "%.2f"|format(grade.percent_a) }}%)</div>
+                            </td>
+                            <td>{{ grade.amount_b }}
+                                <div class="text-muted">({{ "%.2f"|format(grade.percent_b) }})%</div>
+                            </td>
+                            <td>{{ grade.amount_c }}
+                                <div class="text-muted">({{ "%.2f"|format(grade.percent_c) }})%</div>
+                            </td>
+                            <td>{{ grade.amount_d }}
+                                <div class="text-muted">({{ "%.2f"|format(grade.percent_d) }})%</div>
+                            </td>
+                            <td>{{ grade.amount_f }}
+                                <div class="text-muted">({{ "%.2f"|format(grade.percent_f) }})%</div>
+                            </td>
+                            <td>{{ "%.3f"|format(grade.gpa) }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     {% endif %}
     <br/>
 
