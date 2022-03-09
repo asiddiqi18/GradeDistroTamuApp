@@ -1,6 +1,5 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from os import path
 from os import environ, path
 from dotenv import load_dotenv
 db = SQLAlchemy()

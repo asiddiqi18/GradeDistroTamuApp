@@ -11,6 +11,7 @@ import os
 # PdfParser.clean()
 
 app = create_app(True)
+print("Running unit tests")
 app.app_context().push()
 
 logging.basicConfig(filename="debug-report.log", filemode='a', level=logging.DEBUG,
