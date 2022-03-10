@@ -11,10 +11,6 @@ table.dataTable thead .sorting_desc_disabled:before {
     bottom: .5em;
 }
 
-/* body {
-    background-color: red;
-    color: blue;
-} */
 
 .link-backdrop {
     background-color: red;
@@ -25,12 +21,8 @@ table.dataTable thead .sorting_desc_disabled:before {
     white-space: nowrap;
 }
 
-@media (min-width: 768px) {
-    .navbar-brand {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-    }
+.flex-even {
+  flex: 1;
 }
 
 div#loading {

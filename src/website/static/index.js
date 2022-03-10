@@ -1,5 +1,7 @@
 $(document).ready(function () {
-    $('#dtBasicExample').DataTable();
+    $('#dtBasicExample').DataTable(
+        {"scrollX": true}
+    );
     $('.dataTables_length').addClass('bs-select');
 });
 
