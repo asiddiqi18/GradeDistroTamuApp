@@ -1,19 +1,18 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from os import environ, path
+from os import path
 from dotenv import load_dotenv
 db = SQLAlchemy()
 DB_NAME = "grades.db"
 
 
 def create_app(debug=False):
-    app = Flask(__name__, static_folder='./static', template_folder='./templates')
+    app = Flask(__name__)
 
     basedir = path.abspath(path.dirname(__file__))
     load_dotenv(path.join(basedir, '.env'))
 
-    app.config['SECRET_KEY'] = environ.get('SECRET_KEY')
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
+    app.config.from_pyfile('config.py')
     db.init_app(app)
 
     if not debug:
