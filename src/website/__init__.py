@@ -6,13 +6,13 @@ db = SQLAlchemy()
 DB_NAME = "grades.db"
 
 
-def create_app(debug=False):
+def create_app(unit_testing=False):
     app = Flask(__name__)
 
     app.config.from_object('src.website.config.ProdConfig')
     db.init_app(app)
 
-    if not debug:
+    if not unit_testing:
         from src.website.views import colleges, professors, courses, about, errors
 
         app.register_blueprint(colleges.bp)
