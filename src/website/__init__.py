@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path
-from dotenv import load_dotenv
+
 db = SQLAlchemy()
 DB_NAME = "grades.db"
 
@@ -9,10 +9,7 @@ DB_NAME = "grades.db"
 def create_app(debug=False):
     app = Flask(__name__)
 
-    basedir = path.abspath(path.dirname(__file__))
-    load_dotenv(path.join(basedir, '.env'))
-
-    app.config.from_pyfile('config.py')
+    app.config.from_object('src.website.config.ProdConfig')
     db.init_app(app)
 
     if not debug:
