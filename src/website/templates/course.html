@@ -87,8 +87,10 @@
                         <th class="th-sm">C</th>
                         <th class="th-sm">D</th>
                         <th class="th-sm">F</th>
+                        <th class="th-sm">Q-drop</th>
                         <th class="th-sm">GPA</th>
                         <th class="th-sm">Instructor</th>
+
                     </tr>
                     </thead>
                     <tbody>
@@ -115,6 +117,9 @@
                             <td>
                                 {{ grade.amount_f }}
                                 <div class="text-muted">({{ "%.2f"|format(grade.percent_f) }})%</div>
+                            </td>
+                            <td>
+                                {{ grade.other_q }}
                             </td>
                             <td>{{ "%.3f"|format(grade.gpa) }}</td>
                             <td>
