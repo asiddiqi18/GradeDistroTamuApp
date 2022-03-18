@@ -1,5 +1,7 @@
 # TAMU Grade Distribution Database
 
+![Website image showing courses panel!](https://i.imgur.com/rgc6jxS.png)
+
 This project is a web application to view statistical breakdowns of grade distributions at Texas A&M University. 
 
 All records of grades are obtained from [Texas A&M's registrar](https://web-as.tamu.edu/GradeReports/) in PDF formats.
