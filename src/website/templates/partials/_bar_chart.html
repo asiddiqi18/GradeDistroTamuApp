@@ -10,9 +10,10 @@
             labels: ['A', 'B', 'C', 'D', 'F', 'Q-drop'],
             datasets: [
                 {
-                    label: "Total Grade Distribution (number of students)",
+                    label: "Total Grade Distribution (percentage)",
                     backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850", "#8a1806"],
-                    data: [{{ averages.amount_a }}, {{ averages.amount_b }}, {{ averages.amount_c }}, {{ averages.amount_d }}, {{ averages.amount_f }}, {{ averages.other_q }}]
+                    data: [{{ averages.percent_a * 100 }}, {{ averages.percent_b * 100 }}, {{ averages.percent_c * 100 }},
+                        {{ averages.percent_d * 100 }}, {{ averages.percent_f * 100 }}, {{  averages.percent_q * 100 }}]
                 }
             ]
         },
@@ -21,6 +22,14 @@
             title: {
                 display: true,
                 text: 'Grade distribution bar chart'
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: (item) =>
+                            `${item.dataset.label}: ${item.formattedValue}%`,
+                    }
+                }
             }
         }
     });

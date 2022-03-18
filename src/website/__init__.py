@@ -9,7 +9,7 @@ DB_NAME = "grades.db"
 def create_app(unit_testing=False):
     app = Flask(__name__)
 
-    app.config.from_object('src.website.config.ProdConfig')
+    app.config.from_object('src.website.config.DevConfig')
     db.init_app(app)
 
     if not unit_testing:

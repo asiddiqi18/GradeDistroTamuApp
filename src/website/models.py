@@ -67,6 +67,7 @@ class GradesMultiple(Grades):
     def __init__(self, other: [Grades]):
         super().__init__()
 
+        self.percent_q = 0
         self.total_gpa_year = {}
         self.total_courses_year = {}
 
@@ -105,6 +106,7 @@ class GradesMultiple(Grades):
         self.percent_c = self.amount_c / self.total
         self.percent_d = self.amount_d / self.total
         self.percent_f = self.amount_f / self.total
+        self.percent_q = self.other_q / self.total
 
     def sorted_years_and_gpa(self):
         avg_dict = {year: float(self.total_gpa_year[year] / self.total_courses_year[year]) for year in
