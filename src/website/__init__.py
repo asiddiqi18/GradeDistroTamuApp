@@ -13,12 +13,11 @@ def create_app(unit_testing=False):
     db.init_app(app)
 
     if not unit_testing:
-        from src.website.views import colleges, professors, courses, about, errors
+        from src.website.views import colleges, professors, courses, errors
 
         app.register_blueprint(colleges.bp)
         app.register_blueprint(professors.bp)
         app.register_blueprint(courses.bp)
-        app.register_blueprint(about.bp)
 
         app.register_error_handler(404, errors.not_found)
         app.register_error_handler(400, errors.bad_request)
