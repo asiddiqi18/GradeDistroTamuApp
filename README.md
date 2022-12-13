@@ -2,18 +2,13 @@
 
 ![Website image showing courses panel!](https://i.imgur.com/rgc6jxS.png)
 
-This project is a web application to view statistical breakdowns of grade distributions at Texas A&M University. 
+This project is a web application that allows users to view statistical breakdowns of grade distributions at Texas A&M University.
 
-All records of grades are obtained from [Texas A&M's registrar](https://web-as.tamu.edu/GradeReports/) in PDF formats.
+All grade records are obtained from Texas A&M's registrar in PDF format. This web app parses the PDF files using the PyPDF2 library and extracts the relevant information into either JSON or database format.
 
-This website is able to parse through the PDF files and convert them into plain text and extract the needed information into either JSON format or database format.
+This application allows users to search for records by year, college, semester, and professor. You can view charts of a professor's history, including their average GPA breakdown and trends over time.
 
-The parsing of PDF files was achieved through the [PyPDF2](https://pypi.org/project/PyPDF2/) library for Python. This library was able to parse the PDFs correctly, but they lost all formatting during the process. A regex pattern was used to reformat and extract all relevant information.
-
-This application is able to search records by year, college, semester, and professor. You can view charts of a professor's history, including their average GPA breakdown and trends across the years.
-
-
-Most of this project is in Python, and Flask was used as the web framework. SQL-Alchemy and SQLite were used for database management, and ChartJS were used for the interactive charts.
+The application is built mostly in Python, using Flask as the web framework. SQL-Alchemy and SQLite are used for database management, and ChartJS is used for the interactive charts.
 
 Try the website here:
 
